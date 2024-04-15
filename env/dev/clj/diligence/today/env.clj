@@ -13,3 +13,6 @@
    :middleware wrap-dev
    :opts       {:profile       :dev
                 :persist-data? true}})
+
+(def dev? true)
+(def prod? false)
