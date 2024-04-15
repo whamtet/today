@@ -4,8 +4,8 @@
            :test :test
            :prod :prod}
 
- 
- 
+
+
 
  :server/http
  {:port    #long #or [#env PORT 3000]
@@ -13,7 +13,7 @@
   :handler #ig/ref :handler/ring}
 
  :handler/ring
- {:router                #ig/ref :router/core 
+ {:router                #ig/ref :router/core
   :api-path              "/api"
   :cookie-secret         #or [#env COOKIE_SECRET "DHDEWTOQQSHEGTMY"]
   ;; from ring.middleware.defaults. anti-forgery `false` by default because services may not require it
@@ -40,7 +40,7 @@
 
  :reitit.routes/api
  {:base-path "/api"
-  :env       #ig/ref :system/env 
+  :env       #ig/ref :system/env
   }
 
  :router/routes
@@ -48,5 +48,6 @@
 
  :router/core
  {:routes #ig/ref :router/routes
-  :env #ig/ref :system/env}   
-}
+  :env #ig/ref :system/env}
+ :reitit.routes/ui {:base-path "",
+                    :env #ig/ref :system/env}}

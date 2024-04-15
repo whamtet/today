@@ -11,7 +11,8 @@
 
     ;; Routes
     [diligence.today.web.routes.api]
-    )
+    
+    [diligence.today.web.routes.ui])
   (:gen-class))
 
 ;; log uncaught exceptions in threads

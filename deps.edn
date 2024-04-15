@@ -13,7 +13,7 @@
 
            ;; Logging
            ch.qos.logback/logback-classic  {:mvn/version "1.4.14"}
-           
+
            ;; Data coercion
            luminus-transit/luminus-transit {:mvn/version "0.1.6"
                                             :exclusions [com.cognitect/transit-clj]}
@@ -22,7 +22,8 @@
            ;; kit Libs
            io.github.kit-clj/kit-core {:mvn/version "1.0.6"}
            io.github.kit-clj/kit-undertow {:mvn/version "1.0.6"}
-           }
+           simpleui/simpleui {:git/url "https://github.com/whamtet/simpleui",
+                              :git/sha "0fe033e6cfd7acce31b56293c22bd7c46beaba3c"}}
  :aliases {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.6"}}
                    :ns-default build}
 
