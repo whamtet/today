@@ -6,7 +6,7 @@
     "tailwindcss": "^3.3.3"
   },
   "scripts": {
-    "tailwind:extract-classes": "nbb -m autogen.main src/clj/diligence/today/web/views && tailwind -m -i tailwind/input.css -o resources/public/output.css",
+    "tailwind": "nbb -m autogen.main src/clj/diligence/today/web/views && tailwind -m -i tailwind/input.css -o resources/public/output.css",
     "tailwind:watch": "nbb -m autogen.main -w src/clj/diligence/today/web/views"
   }
 }
