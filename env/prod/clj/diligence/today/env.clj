@@ -13,3 +13,6 @@
 
 (def dev? false)
 (def prod? true)
+
+(defn host [s]
+  (str "https://diligence.today" s))

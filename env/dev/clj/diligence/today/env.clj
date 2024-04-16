@@ -16,3 +16,5 @@
 
 (def dev? true)
 (def prod? false)
+(defn host [s]
+  (str "http://localhost:3000" s))
