@@ -28,7 +28,7 @@
 (defcomponent ^:endpoint home [req]
   [:div
    [:h1.text-center.mt-32 "diligence.today"]
-   logins
+   [:div.mt-8.flex.w-full.justify-center logins]
    ])
 
 (defn ui-routes [base-path]
