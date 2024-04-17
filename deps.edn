@@ -2,6 +2,7 @@
            "resources"]
 
  :deps    {org.clojure/clojure {:mvn/version "1.11.1"}
+           com.google.api-client/google-api-client      {:mvn/version "1.32.1"}
 
            ;; Routing
  metosin/reitit {:mvn/version "0.6.0"}
