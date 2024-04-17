@@ -22,7 +22,7 @@
                                    :cookie-name "diligence.today"
                                    :cookie-attrs {:max-age 86400
                                                   :http-only true
-                                                  :same-site :strict}}
+                                                  :same-site :lax}}
                          :security {:anti-forgery false
                                     :xss-protection {:enable? true,
                                                      :mode :block}
@@ -46,7 +46,8 @@
  {:routes #ig/ref :router/routes
   :env #ig/ref :system/env}
  :reitit.routes/ui {:base-path "",
-                    :env #ig/ref :system/env}
+                    :env #ig/ref :system/env
+                    :query-fn #ig/ref :db.sql/query-fn}
  :db.sql/query-fn {:conn #ig/ref :db.sql/connection,
                    :options {},
                    :filename "sql/queries.sql"}

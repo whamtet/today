@@ -1,8 +1,8 @@
 (ns diligence.today.web.views.home
     (:require
       [diligence.today.env :refer [host]]
-      [simpleui.core :as simpleui :refer [defcomponent]]
-      [diligence.today.web.htmx :refer [page-htmx]]))
+      [simpleui.core :as simpleui]
+      [diligence.today.web.htmx :refer [page-htmx defcomponent]]))
 
 (defn- logged-in? [req]
   (-> req :session :id boolean))
@@ -14,7 +14,7 @@
      :data-client_id (System/getenv "GSI_CLIENT")
      :data-context "signin",
      :data-ux_mode "redirect",
-     :data-login_uri (host "/api/gsi")
+     :data-login_uri "https://diligence.today/api/gsi"
      :data-auto_prompt "false"}]
    [:div
     {:class "g_id_signin",
@@ -26,14 +26,15 @@
      :data-logo_alignment "left"}]])
 
 (defcomponent ^:endpoint home [req]
-  [:div
-   [:h1.text-center.mt-32 "diligence.today"]
-   [:div.mt-8.flex.w-full.justify-center logins]
-   ])
+  (if user_id
+    "logged_in"
+    [:div
+     [:h1.text-center.mt-32 "diligence.today"]
+     [:div.mt-8.flex.w-full.justify-center logins]]))
 
-(defn ui-routes [base-path]
+(defn ui-routes []
   (simpleui/make-routes
-   base-path
+   ""
    (fn [req]
      (page-htmx
       {:google? (not (logged-in? req))}

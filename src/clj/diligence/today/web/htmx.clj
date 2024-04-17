@@ -2,6 +2,7 @@
   (:require
    [diligence.today.env :refer [dev?]]
    [diligence.today.web.resource-cache :as resource-cache]
+   [simpleui.core :as simpleui]
    [simpleui.render :as render]
    [ring.util.http-response :as http-response]
    [hiccup.core :as h]
@@ -36,3 +37,12 @@
               (unminify "https://unpkg.com/htmx.org@1.9.5/dist/htmx.min.js")}]
     [:script "htmx.config.defaultSwapStyle = 'outerHTML';"]
     (scripts options)]))
+
+(defmacro defcomponent
+  [name [req :as args] & body]
+  (if-let [sym (simpleui/symbol-or-as req)]
+    `(simpleui/defcomponent ~name ~args
+      (let [{:keys [~'session]} ~sym
+            {:keys [~'user_id]} ~'session]
+        ~@body))
+    (throw (Exception. "req ill defined"))))

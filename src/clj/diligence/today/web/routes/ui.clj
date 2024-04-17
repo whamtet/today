@@ -23,7 +23,5 @@
 (derive :reitit.routes/ui :reitit/routes)
 
 (defmethod ig/init-key :reitit.routes/ui
-  [_ {:keys [base-path]
-      :or   {base-path ""}
-      :as   opts}]
-  [base-path (route-data opts) (home/ui-routes base-path)])
+  [_ opts]
+  ["" (route-data opts) (home/ui-routes)])
