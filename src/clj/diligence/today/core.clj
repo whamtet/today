@@ -5,14 +5,16 @@
     [diligence.today.config :as config]
     [diligence.today.env :refer [defaults]]
 
-    ;; Edges       
+    ;; Edges
     [kit.edge.server.undertow]
     [diligence.today.web.handler]
 
     ;; Routes
     [diligence.today.web.routes.api]
-    
-    [diligence.today.web.routes.ui])
+
+    [diligence.today.web.routes.ui]
+    [kit.edge.db.sql.conman]
+    [diligence.today.migratus])
   (:gen-class))
 
 ;; log uncaught exceptions in threads
