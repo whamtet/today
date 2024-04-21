@@ -8,3 +8,6 @@ set first_name = :given_name,
 last_name = :family_name,
 pic = :picture
 returning user_id
+
+-- :name get-user-by-id :query :one
+select * from user where user_id = :user_id

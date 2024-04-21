@@ -2,7 +2,9 @@
     (:require
       [diligence.today.env :refer [host]]
       [simpleui.core :as simpleui]
-      [diligence.today.web.htmx :refer [page-htmx defcomponent]]
+      [diligence.today.web.htmx :refer [page-htmx
+                                        defcomponent
+                                        defcomponent-user]]
       [diligence.today.web.views.dropdown :as dropdown]))
 
 (defn- logged-in? [req]
@@ -34,13 +36,13 @@
      :data-size "large",
      :data-logo_alignment "left"}]])
 
-(defcomponent panel [req]
+(defcomponent-user panel [req]
   [:div {:_ "on click add .hidden to .drop"}
    ;; header row
    [:div
     [:a.inline-block {:href "/"}
      [:img.w-16.m-2 {:src "/icon.png"}]]
-    (main-dropdown user_id)]])
+    (main-dropdown first_name)]])
 
 (defcomponent ^:endpoint home [req]
   (cond
@@ -51,11 +53,11 @@
            :src "/base_logo_transparent_background.png"}]
     [:div.flex.w-full.justify-center logins]]))
 
-(defn ui-routes []
+(defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
    ""
    (fn [req]
      (page-htmx
       {:google? (not (logged-in? req))
        :hyperscript? (logged-in? req)}
-      (home req)))))
+      (-> req (assoc :query-fn query-fn) home)))))

@@ -24,4 +24,4 @@
 
 (defmethod ig/init-key :reitit.routes/ui
   [_ opts]
-  ["" (route-data opts) (home/ui-routes)])
+  ["" (route-data opts) (home/ui-routes opts)])

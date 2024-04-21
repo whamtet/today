@@ -1,6 +1,7 @@
 (ns diligence.today.web.htmx
   (:require
    [diligence.today.env :refer [dev?]]
+   [diligence.today.web.controllers.user :as user]
    [diligence.today.web.resource-cache :as resource-cache]
    [simpleui.core :as simpleui]
    [simpleui.render :as render]
@@ -43,5 +44,15 @@
     `(simpleui/defcomponent ~name ~args
       (let [{:keys [~'session]} ~sym
             {:keys [~'user_id]} ~'session]
+        ~@body))
+    (throw (Exception. "req ill defined"))))
+
+(defmacro defcomponent-user
+  [name [req :as args] & body]
+  (if-let [sym (simpleui/symbol-or-as req)]
+    `(simpleui/defcomponent ~name ~args
+      (let [{:keys [~'session]} ~sym
+            {:keys [~'user_id]} ~'session
+            {:keys [~'first_name]} (user/get-user ~sym)]
         ~@body))
     (throw (Exception. "req ill defined"))))
