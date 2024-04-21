@@ -11,4 +11,4 @@ test:
 	clj -M:test
 
 uberjar:
-	clj -T:build all
+	npm run tailwind && clj -T:build all

@@ -5,7 +5,6 @@
    [simpleui.core :as simpleui]
    [simpleui.render :as render]
    [ring.util.http-response :as http-response]
-   [hiccup.core :as h]
    [hiccup.page :as p]))
 
 (defn page [opts & content]

@@ -45,6 +45,9 @@
           (assoc :query-fn query-fn)
           user/upsert-user
           (->> (assoc (response/redirect "/") :session))))]
+   ["/logout"
+    (fn [_]
+      (assoc response/hx-refresh :session {}))]
    #_
    ["/session"
     (fn [req]
