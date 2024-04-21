@@ -28,8 +28,8 @@
   (page
    [:head
     [:meta {:charset "UTF-8"}]
-    [:title "diligence.today"]
-    [:link {:rel "icon" :href "/logo.ico"}]
+    [:title "SimplifyDD"]
+    [:link {:rel "icon" :href "/icon.png"}]
     [:link {:rel "stylesheet" :href (resource-cache/cache-suffix "/output.css")}]]
    [:body
     (render/walk-attrs body)

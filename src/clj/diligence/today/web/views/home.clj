@@ -29,8 +29,9 @@
   (if user_id
     "logged_in"
     [:div
-     [:h1.text-center.mt-32 "diligence.today"]
-     [:div.mt-8.flex.w-full.justify-center logins]]))
+     [:img {:class "mt-20 mb-12 w-2/3 mx-auto"
+            :src "/base_logo_transparent_background.png"}]
+     [:div.flex.w-full.justify-center logins]]))
 
 (defn ui-routes []
   (simpleui/make-routes
