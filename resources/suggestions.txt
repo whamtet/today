@@ -1,0 +1,41 @@
+# Commercial
+What is the market size and growth trajectory?
+Where is the target positioned in the value chain?
+What is the target’s market share and prospects to gain share?
+How does the Target perform vs. KPCs and on overall customer sentiment?
+What is the Target’s current and forecasted financial performance?
+
+# Cost synergies
+What is the target’s cost baseline across all relevant categories / functional areas?
+What is the top-down estimate of cost synergies, based on peer benchmarks?
+What is the bottom-up estimate of cost synergies?
+What is the timing to realize cost synergies?
+What is the cost to achieve cost synergies, and other dependencies?
+
+# Revenue synergies and Go-to Market
+What is the relevant revenue baseline?
+What are the specific revenue growth levers (e.g., specific sales plays) that will grow this baseline?
+How much growth could these levers provide, based on primary research and customer input?
+What is the optimal Go-to-Market (GTM) structure to enable synergies?
+What is the timing to realize revenue synergies, and the cost to achieve?
+
+# IT diligence
+What is the cost & performance baseline of the IT function?
+How well does the IT operating model enable the strategy?
+How reliable, secure, and scalable are key applications & infrastructure?
+What opportunities exist to drive savings through cost synergies and what are their implementation risks?
+
+# Tech diligence
+How strong is the target’s technology offerings relative to peers?
+How well does the target’s data and analytics strategy enable the success of its technology offerings?
+How well does the target’s infrastructure enable its technology offerings?  (e.g., scalable hosting)
+How effective it the target’s technology and R&D organization?
+
+# ESG
+What are the ESG dimensions that matter most for this deal?
+How does the target perform against each dimension?
+What are the opportunities and risks associated with the target’s ESG performance, and the cost to address them?
+
+# Talent
+Who are the key leaders at the target that must be retained?
+What is the overall quality of talent at the target and is it sufficient to deliver the strategy?

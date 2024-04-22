@@ -3,6 +3,7 @@
    [diligence.today.web.middleware.exception :as exception]
    [diligence.today.web.middleware.formats :as formats]
    [diligence.today.web.views.home :as home]
+   [diligence.today.web.views.question-maker :as question-maker]
    [integrant.core :as ig]
    [reitit.ring.middleware.muuntaja :as muuntaja]
    [reitit.ring.middleware.parameters :as parameters]))
@@ -24,4 +25,5 @@
 
 (defmethod ig/init-key :reitit.routes/ui
   [_ opts]
-  ["" (route-data opts) (home/ui-routes opts)])
+  [["" (route-data opts) (home/ui-routes opts)]
+   ["/project/:project_id" (route-data opts) (question-maker/ui-routes opts)]])

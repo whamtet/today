@@ -31,10 +31,8 @@
      :data-logo_alignment "left"}]])
 
 (defcomponent ^:endpoint home [req]
-  (cond
-   project-name (question-maker/question-maker req)
-   user_id (project-selector/project-selector req)
-   :else
+  (if user_id
+   (project-selector/project-selector req)
    [:div
     [:img {:class "mt-20 mb-12 w-1/2 mx-auto"
            :src "/base_logo_transparent_background.png"}]

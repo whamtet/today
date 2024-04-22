@@ -8,38 +8,32 @@
       [diligence.today.web.views.dropdown :as dropdown]
       [simpleui.response :as response]))
 
-(defn assoc-session [{:keys [session]} k v]
-  (assoc response/hx-refresh :session (assoc session k v)))
-(defn dissoc-session [{:keys [session]} k]
-  (assoc response/hx-refresh :session (dissoc session k)))
-
 (defn- uniqueness-violation? [e]
   (-> e str (.contains "SQLITE_CONSTRAINT_UNIQUE")))
 
-(defcomponent-user ^:endpoint project-selector [req command project-name]
+(defcomponent-user ^:endpoint project-selector [req command new-project-name]
   (case command
         "new" (iam/when-authorized
                (try
-                 (project/create-project req project-name)
-                 (assoc-session req :project-name project-name)
+                 (let [project_id (project/create-project req new-project-name)]
+                   (response/hx-redirect (str "/project/" project_id)))
                  (catch clojure.lang.ExceptionInfo e
                    (if (uniqueness-violation? e)
                      [:div#unique-warning.my-3 (components/warning "Project name in use.")]
                      (throw e)))))
-        "start" (iam/when-authorized
-                 (assoc-session req :project-name project-name))
-        "unselect" (iam/when-authorized
-                    (dissoc-session req :project-name))
         [:div {:_ "on click add .hidden to .drop"}
          ;; header row
-         (common/header-row first_name true)
+         [:div
+          [:a.inline-block {:href "/"}
+           [:img.w-16.m-2 {:src "/icon.png"}]]
+          (common/main-dropdown first_name true)]
          [:div {:class "w-1/2 border rounded-lg mx-auto"}
           ;; creation form
           [:form {:class "flex"
                   :hx-post "project-selector:new"
                   :hx-target "#unique-warning"}
            [:input {:class "p-2 w-full"
-                    :name "project-name"
+                    :name "new-project-name"
                     :placeholder "Create project..."
                     :required true}]
            [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24"
@@ -48,8 +42,7 @@
           [:div#unique-warning]
           ;; project selector
           [:div.text-gray-500
-           (for [{:keys [name]} (project/get-projects req)]
-             [:div {:class "p-3 hover:bg-slate-100 cursor-pointer"
-                    :hx-post "project-selector:start"
-                    :hx-vals {:project-name name}}
-              name])]]]))
+           (for [{:keys [name project_id]} (project/get-projects req)]
+             [:a {:href (str "/project/" project_id)}
+              [:div {:class "p-3 hover:bg-slate-100 cursor-pointer"}
+               name]])]]]))

@@ -12,8 +12,18 @@ returning user_id
 -- :name get-user-by-id :query :one
 select * from user where user_id = :user_id
 
--- :name create-project :execute
+-- :name create-project :returning-execute
 insert into project (name) values (:project-name)
+returning project_id;
 
 -- :name get-projects :query
 select * from project;
+
+-- :name get-project-by-name :query :one
+select project_id from project where name = :new-project-name
+
+-- :name get-project-by-id :query :one
+select name from project where project_id = :project_id
+
+-- :name get-questions :query
+select * from question where project_id = :project_id;
