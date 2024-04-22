@@ -11,3 +11,6 @@ returning user_id
 
 -- :name get-user-by-id :query :one
 select * from user where user_id = :user_id
+
+-- :name create-project :execute
+insert into project (name) values (:project-name)

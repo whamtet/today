@@ -2,13 +2,20 @@
     (:require
       [diligence.today.env :refer [host]]
       [simpleui.core :as simpleui]
+      [simpleui.response :as response]
+      [diligence.today.web.controllers.iam :as iam]
+      [diligence.today.web.controllers.project :as project]
       [diligence.today.web.htmx :refer [page-htmx
                                         defcomponent
                                         defcomponent-user]]
+      [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]))
 
 (defn- logged-in? [req]
   (-> req :session :user_id boolean))
+
+(defn assoc-session [{:keys [session]} k v]
+  (assoc response/hx-refresh :session (assoc session k v)))
 
 (defn main-dropdown [user_name]
   [:div.absolute.top-1.right-1.flex.items-center
@@ -36,17 +43,41 @@
      :data-size "large",
      :data-logo_alignment "left"}]])
 
-(defcomponent-user panel [req]
-  [:div {:_ "on click add .hidden to .drop"}
-   ;; header row
-   [:div
-    [:a.inline-block {:href "/"}
-     [:img.w-16.m-2 {:src "/icon.png"}]]
-    (main-dropdown first_name)]])
+(defn- uniqueness-violation? [e]
+  (-> e str (.contains "SQLITE_CONSTRAINT_UNIQUE")))
+
+(defcomponent-user ^:endpoint project-selector [req command project-name]
+  (case command
+        "new" (iam/when-authorized
+               (try
+                 (project/create-project req project-name)
+                 (assoc-session req :project-name project-name)
+                 (catch clojure.lang.ExceptionInfo e
+                   (if (uniqueness-violation? e)
+                     [:div#unique-warning.my-3 (components/warning "Project name in use.")]
+                     (throw e)))))
+        [:div {:_ "on click add .hidden to .drop"}
+         ;; header row
+         [:div
+          [:a.inline-block {:href "/"}
+           [:img.w-16.m-2 {:src "/icon.png"}]]
+          (main-dropdown first_name)]
+         [:div {:class "w-1/2 border rounded-lg mx-auto"}
+          [:form {:class "flex"
+                  :hx-post "project-selector:new"
+                  :hx-target "#unique-warning"}
+           [:input {:class "p-2 w-full"
+                    :name "project-name"
+                    :placeholder "Create project..."
+                    :required true}]
+           [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24"
+                    :type "submit"
+                    :value "Create"}]]
+          [:div#unique-warning]]]))
 
 (defcomponent ^:endpoint home [req]
   (cond
-   user_id (panel req)
+   user_id (project-selector req)
    :else
    [:div
     [:img {:class "mt-20 mb-12 w-1/2 mx-auto"
@@ -56,6 +87,7 @@
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
    ""
+   [query-fn]
    (fn [req]
      (page-htmx
       {:google? (not (logged-in? req))

@@ -48,12 +48,11 @@
    ["/logout"
     (fn [_]
       (assoc response/hx-refresh :session {}))]
-   #_
    ["/session"
     (fn [req]
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (-> req (dissoc :reitit.core/match :reitit.core/router) pr-str)})]
+       :body (-> req :session #_(dissoc :reitit.core/match :reitit.core/router) pr-str)})]
    ["/health"
     {:get health/healthcheck!}]])
 
