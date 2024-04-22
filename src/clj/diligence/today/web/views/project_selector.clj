@@ -3,23 +3,18 @@
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.project :as project]
       [diligence.today.web.htmx :refer [defcomponent-user]]
+      [diligence.today.web.views.common :as common]
       [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]
       [simpleui.response :as response]))
 
 (defn assoc-session [{:keys [session]} k v]
   (assoc response/hx-refresh :session (assoc session k v)))
+(defn dissoc-session [{:keys [session]} k]
+  (assoc response/hx-refresh :session (dissoc session k)))
 
 (defn- uniqueness-violation? [e]
   (-> e str (.contains "SQLITE_CONSTRAINT_UNIQUE")))
-
-(defn main-dropdown [user_name]
-  [:div.absolute.top-1.right-1.flex.items-center
-   (dropdown/dropdown
-    (str "Welcome " user_name)
-    [[:a {:href ""}
-      [:div.p-2 {:hx-post "/api/logout"}
-       "Logout"]]])])
 
 (defcomponent-user ^:endpoint project-selector [req command project-name]
   (case command
@@ -33,12 +28,11 @@
                      (throw e)))))
         "start" (iam/when-authorized
                  (assoc-session req :project-name project-name))
+        "unselect" (iam/when-authorized
+                    (dissoc-session req :project-name))
         [:div {:_ "on click add .hidden to .drop"}
          ;; header row
-         [:div
-          [:a.inline-block {:href "/"}
-           [:img.w-16.m-2 {:src "/icon.png"}]]
-          (main-dropdown first_name)]
+         (common/header-row first_name true)
          [:div {:class "w-1/2 border rounded-lg mx-auto"}
           ;; creation form
           [:form {:class "flex"

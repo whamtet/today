@@ -6,7 +6,8 @@
                                         defcomponent
                                         defcomponent-user]]
       [diligence.today.web.views.dropdown :as dropdown]
-      [diligence.today.web.views.project-selector :as project-selector]))
+      [diligence.today.web.views.project-selector :as project-selector]
+      [diligence.today.web.views.question-maker :as question-maker]))
 
 (defn- logged-in? [req]
   (-> req :session :user_id boolean))
@@ -31,6 +32,7 @@
 
 (defcomponent ^:endpoint home [req]
   (cond
+   project-name (question-maker/question-maker req)
    user_id (project-selector/project-selector req)
    :else
    [:div

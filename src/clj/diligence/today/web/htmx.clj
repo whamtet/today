@@ -43,7 +43,7 @@
   (if-let [sym (simpleui/symbol-or-as req)]
     `(simpleui/defcomponent ~name ~args
       (let [{:keys [~'session]} ~sym
-            {:keys [~'user_id]} ~'session]
+            {:keys [~'user_id ~'project-name]} ~'session]
         ~@body))
     (throw (Exception. "req ill defined"))))
 
@@ -52,7 +52,7 @@
   (if-let [sym (simpleui/symbol-or-as req)]
     `(simpleui/defcomponent ~name ~args
       (let [{:keys [~'session]} ~sym
-            {:keys [~'user_id]} ~'session
+            {:keys [~'user_id ~'project-name]} ~'session
             {:keys [~'first_name]} (user/get-user ~sym)]
         ~@body))
     (throw (Exception. "req ill defined"))))
