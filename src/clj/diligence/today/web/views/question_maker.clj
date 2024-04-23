@@ -21,12 +21,13 @@
          (question/add-question req project_id question)
          response/hx-refresh)))
     [:div
-     [:input {:class "w-full p-2"
+     [:input {:class "w-full p-2 form-select"
               :name "question"
               :value question
               :hx-post "question-edit"
               :placeholder "New question..."
-              :hx-vals {:question_id question_id}}]]))
+              :hx-vals {:question_id question_id}
+              :list "suggestions"}]]))
 
 (defcomponent ^:endpoint project-edit [req project-name]
   (if (simpleui/post? req)
@@ -72,7 +73,7 @@
       [:a.absolute.left-1.top-1 {:href "/"}
        [:img.w-16.m-2 {:src "/icon.png"}]]
       (project-ro project-name)
-      (common/main-dropdown first_name false)]
+      (common/main-dropdown first_name)]
      [:datalist#suggestions
       (map
        #(vector :option {:value %})

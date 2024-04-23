@@ -9,7 +9,7 @@
 (defn dropdown [label other-items]
   [:div.p-1
    (button label)
-   [:div {:class "drop hidden rounded-lg border p-1 m-1 absolute right-0 top-9.5 w-48"}
+   [:div {:class "drop hidden rounded-lg border p-1 m-1 absolute right-0 top-9.5 w-48 bg-white"}
     (for [item other-items]
       [:div {:class "hover:bg-slate-100"}
        item])]])
