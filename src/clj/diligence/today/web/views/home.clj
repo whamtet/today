@@ -2,6 +2,8 @@
     (:require
       [diligence.today.env :refer [host]]
       [simpleui.core :as simpleui]
+      [simpleui.response :as response]
+      [diligence.today.web.controllers.project :as project]
       [diligence.today.web.htmx :refer [page-htmx
                                         defcomponent
                                         defcomponent-user]]
@@ -43,7 +45,11 @@
    ""
    [query-fn]
    (fn [req]
-     (page-htmx
-      {:google? (not (logged-in? req))
-       :hyperscript? (logged-in? req)}
-      (-> req (assoc :query-fn query-fn) home)))))
+     (if-let [{:keys [project_id]}
+              (and (-> req :session :user_id)
+                   (-> req (assoc :query-fn query-fn) project/get-project))]
+       (response/redirect (format "/project/%s/" project_id))
+       (page-htmx
+        {:google? (not (logged-in? req))
+         :hyperscript? (logged-in? req)}
+        (-> req (assoc :query-fn query-fn) home))))))

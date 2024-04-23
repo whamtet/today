@@ -19,6 +19,9 @@ returning project_id;
 -- :name get-projects :query
 select * from project;
 
+-- :name get-project :query :one
+select * from project;
+
 -- :name get-project-by-name :query :one
 select project_id from project where name = :new-project-name
 

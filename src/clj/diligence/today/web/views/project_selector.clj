@@ -16,7 +16,7 @@
         "new" (iam/when-authorized
                (try
                  (let [project_id (project/create-project req new-project-name)]
-                   (response/hx-redirect (str "/project/" project_id)))
+                   (response/hx-redirect (format "/project/%s/" project_id)))
                  (catch clojure.lang.ExceptionInfo e
                    (if (uniqueness-violation? e)
                      [:div#unique-warning.my-3 (components/warning "Project name in use.")]
