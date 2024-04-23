@@ -17,3 +17,6 @@
 
 (defn get-project-by-id [{:keys [query-fn]} project_id]
   (query-fn :get-project-by-id {:project_id project_id}))
+
+(defn update-project [{:keys [query-fn]} project_id project-name]
+  (query-fn :update-project {:name project-name :project_id project_id}))
