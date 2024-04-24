@@ -7,6 +7,7 @@
       [diligence.today.web.views.common :as common]
       [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]
+      [diligence.today.web.views.icons :as icons]
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 
@@ -50,16 +51,21 @@
           :hx-get "question-edit"}
    (components/hiddensm question_id question)
    [:div.min-w-72.mx-2 question]
-   [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24"
+   [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24 mr-2 cursor-pointer"
             :type "submit"
-            :value "Edit"}]])
+            :value "Edit"}]
+   [:a {:class "bg-clj-blue p-1.5 rounded-lg text-white text-center w-24 mr-2 cursor-pointer"
+        :href (format "question/%s/" question_id)} "Explore..."]
+   [:button {:class "bg-clj-blue p-1.5 rounded-lg text-white"
+             :type "button"
+             :onclick "alert('Delete under menu -> Config...')"} icons/trash]])
 
 (defn project-ro [project-name]
   [:form {:class "flex items-center"
           :hx-get "project-edit"}
    (components/hiddensm project-name)
    [:div.my-6.mr-4.text-gray-500.text-4xl project-name]
-   [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24"
+   [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24 cursor-pointer"
             :type "submit"
             :value "Edit"}]])
 
