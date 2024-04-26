@@ -1,7 +1,7 @@
 (ns diligence.today.web.views.question-editor
     (:require
+      [diligence.today.web.controllers.file :as file]
       [diligence.today.web.controllers.iam :as iam]
-      [diligence.today.web.controllers.project :as project]
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [page-htmx defcomponent defcomponent-user]]
       [diligence.today.web.views.common :as common]
@@ -11,17 +11,25 @@
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 
-(defcomponent-user ^:endpoint question-editor [req]
-  (let [questions (question/get-questions req project_id)
-        {project-name :name} (project/get-project-by-id req project_id)]
+(defcomponent-user ^:endpoint question-editor [req file]
+  (if (simpleui/post? req)
+    (iam/when-authorized
+     (file/copy-file file)
+     response/hx-refresh)
     [:div {:_ "on click add .hidden to .drop"}
      ;; header row
      [:div {:class "flex justify-center"}
       [:a.absolute.left-1.top-1 {:href "/"}
        [:img.w-16.m-2 {:src "/icon.png"}]]
       (common/main-dropdown first_name)]
-     [:div {:class "w-3/4 border rounded-lg mx-auto mt-16"}
-      "fuck yeah!"]]))
+     [:div {:class "w-3/4 border rounded-lg mx-auto mt-16 p-2"}
+      (components/button-label "add-file" "Add File")
+      [:input#add-file {:class "hidden"
+                        :type "file"
+                        :name "file"
+                        :accept "application/pdf"
+                        :hx-post "question-editor"
+                        :hx-encoding "multipart/form-data"}]]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
