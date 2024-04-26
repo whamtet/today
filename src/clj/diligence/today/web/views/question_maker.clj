@@ -21,14 +21,15 @@
         (iam/when-authorized
          (question/add-question req project_id question)
          response/hx-refresh)))
-    [:div
-     [:input {:class "w-full p-2 form-select"
-              :name "question"
-              :value question
-              :hx-post "question-edit"
-              :placeholder "New question..."
-              :hx-vals {:question_id question_id}
-              :list "suggestions"}]]))
+    [:tr
+     [:td {:colspan 2}
+      [:input {:class "w-full p-2 form-select"
+               :name "question"
+               :value question
+               :hx-post "question-edit"
+               :placeholder "New question..."
+               :hx-vals {:question_id question_id}
+               :list "suggestions"}]]]))
 
 (defcomponent ^:endpoint project-edit [req project-name]
   (if (simpleui/post? req)
@@ -47,18 +48,18 @@
               :value "Save"}]]))
 
 (defn question-ro [question_id question]
-  [:form {:class "flex items-center my-2"
-          :hx-get "question-edit"}
-   (components/hiddensm question_id question)
-   [:div.min-w-72.mx-2 question]
-   [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24 mr-2 cursor-pointer"
-            :type "submit"
-            :value "Edit"}]
-   [:a {:class "bg-clj-blue p-1.5 rounded-lg text-white text-center w-24 mr-2 cursor-pointer"
-        :href (format "question/%s/" question_id)} "Explore..."]
-   [:button {:class "bg-clj-blue p-1.5 rounded-lg text-white"
-             :type "button"
-             :onclick "alert('Delete under menu -> Config...')"} icons/trash]])
+  [:tr {:hx-target "this"}
+   [:td.p-2 question]
+   [:td.p-2
+    [:div.flex.items-center
+     [:span {:hx-get "question-edit"
+             :hx-vals {:question_id question_id :question question}}
+      (components/button "Edit")]
+     [:a {:class "bg-clj-blue p-1.5 rounded-lg text-white text-center w-24 mx-2"
+          :href (format "question/%s/" question_id)} "Explore..."]
+     [:span {:class "opacity-50 cursor-pointer"
+             :onclick "alert('Delete under menu -> Config...')"}
+      icons/trash]]]])
 
 (defn project-ro [project-name]
   [:form {:class "flex items-center"
@@ -85,8 +86,10 @@
        #(vector :option {:value %})
        question/suggestions)]
      [:div {:class "w-3/4 border rounded-lg mx-auto"}
-      (for [{:keys [question_id question]} questions]
-        (question-ro question_id question))
+      [:table
+       [:tbody
+        (for [{:keys [question_id question]} questions]
+          (question-ro question_id question))]]
       [:hr.mt-4.border]
       (question-edit req nil nil)]]))
 

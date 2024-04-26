@@ -10,19 +10,18 @@
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 
-(defcomponent ^:endpoint question-ro [req question_id question]
+(defcomponent ^:endpoint question-row [req question_id question]
   (if (simpleui/delete? req)
     (iam/when-authorized
      (question/delete-question req question_id)
      "")
-    [:form {:class "flex items-center my-2"
-            :hx-delete "question-ro"
-            :hx-confirm "Permanently delete?"}
-     (components/hiddensm question_id)
-     [:div.min-w-72.mx-2 question]
-     [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24"
-              :type "submit"
-              :value "Delete"}]]))
+    [:tr {:hx-target "this"}
+     [:td.p-2 question]
+     [:td.p-2
+      [:span {:hx-delete "question-row"
+              :hx-confirm "Permanently delete?"
+              :hx-vals {:question_id question_id}}
+       (components/button "Delete")]]]))
 
 (defcomponent-user ^:endpoint question-maker [req]
   (let [questions (question/get-questions-all req)]
@@ -34,8 +33,10 @@
        [:img.w-16.m-2 {:src "/icon.png"}]]
       (common/main-dropdown first_name)]
      [:div {:class "w-3/4 border rounded-lg mx-auto"}
-      (for [{:keys [question_id question]} questions]
-        (question-ro req question_id question))]]))
+      [:table
+       [:tbody
+        (for [{:keys [question_id question]} questions]
+          (question-row req question_id question))]]]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes

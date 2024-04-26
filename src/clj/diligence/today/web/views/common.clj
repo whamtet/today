@@ -6,7 +6,7 @@
   [:div.absolute.top-1.right-1.flex.items-center
    (dropdown/dropdown
     (str "Welcome " user_name)
-    (->
-     (list [:div.p-2.cursor-pointer {:hx-post "/api/logout"} "Logout"])
-     (conj [:a {:href "/admin/"}
-            [:div.p-2.cursor-pointer "Config..."]])))])
+    (list
+     [:a {:href "/"} [:div.p-2 "Manage Project..."]]
+     [:a {:href "/admin/"} [:div.p-2 "Config..."]]
+     [:div.p-2.cursor-pointer {:hx-post "/api/logout"} "Logout"]))])
