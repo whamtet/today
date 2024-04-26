@@ -21,7 +21,7 @@
      :data-client_id (System/getenv "GSI_CLIENT")
      :data-context "signin",
      :data-ux_mode "redirect",
-     :data-login_uri "https://diligence.today/api/gsi"
+     :data-login_uri (host "/api/gsi")
      :data-auto_prompt "false"}]
    [:div
     {:class "g_id_signin",

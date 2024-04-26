@@ -15,4 +15,4 @@
 (def prod? true)
 
 (defn host [s]
-  (str "https://diligence.today" s))
+  (str "https://app.simplifydd.com" s))
