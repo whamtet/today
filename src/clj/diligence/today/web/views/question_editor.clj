@@ -14,7 +14,7 @@
 (defcomponent-user ^:endpoint question-editor [req file]
   (if (simpleui/post? req)
     (iam/when-authorized
-     (file/copy-file file)
+     (file/copy-file req question_id file)
      response/hx-refresh)
     [:div {:_ "on click add .hidden to .drop"}
      ;; header row
@@ -23,13 +23,17 @@
        [:img.w-16.m-2 {:src "/icon.png"}]]
       (common/main-dropdown first_name)]
      [:div {:class "w-3/4 border rounded-lg mx-auto mt-16 p-2"}
-      (components/button-label "add-file" "Add File")
-      [:input#add-file {:class "hidden"
-                        :type "file"
-                        :name "file"
-                        :accept "application/pdf"
-                        :hx-post "question-editor"
-                        :hx-encoding "multipart/form-data"}]]]))
+      [:div.mb-2 (components/button-label "add-file" "Add File")
+       [:input#add-file {:class "hidden"
+                         :type "file"
+                         :name "file"
+                         :accept "application/pdf"
+                         :hx-post "question-editor"
+                         :hx-encoding "multipart/form-data"}]]
+      [:div.flex.items-center
+       (for [{:keys [file_id]} (file/get-files req question_id)]
+         [:img {:class "w-64"
+                :src (str "/api/thumbnail/" file_id)}])]]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes

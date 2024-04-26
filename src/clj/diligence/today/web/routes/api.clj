@@ -1,5 +1,6 @@
 (ns diligence.today.web.routes.api
   (:require
+    [diligence.today.web.controllers.file :as file]
     [diligence.today.web.controllers.health :as health]
     [diligence.today.web.controllers.user :as user]
     [diligence.today.web.middleware.exception :as exception]
@@ -53,6 +54,12 @@
       {:status 200
        :headers {"Content-Type" "text/html"}
        :body (-> req :session #_(dissoc :reitit.core/match :reitit.core/router) pr-str)})]
+   ["/thumbnail/:file_id"
+    (fn [req]
+      (-> req :session :user_id assert)
+      {:status 200
+       :headers {"Content-Type" "image/jpg"}
+       :body (-> req (assoc :query-fn query-fn) (file/get-file-stream (-> req :path-params :file_id)))})]
    ["/health"
     {:get health/healthcheck!}]])
 
