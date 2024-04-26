@@ -12,3 +12,6 @@ test:
 
 uberjar:
 	pkill java && npm run tailwind && clj -T:build all
+
+dangerous-build:
+    npm run tailwind && clj -T:build all
