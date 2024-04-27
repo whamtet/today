@@ -1,6 +1,6 @@
 (ns diligence.today.web.views.home
     (:require
-      [diligence.today.env :refer [host]]
+      [diligence.today.env :refer [host dev?]]
       [simpleui.core :as simpleui]
       [simpleui.response :as response]
       [diligence.today.web.controllers.project :as project]
@@ -38,7 +38,9 @@
    [:div
     [:img {:class "mt-20 mb-12 w-1/2 mx-auto"
            :src "/base_logo_transparent_background.png"}]
-    [:div.flex.w-full.justify-center logins]]))
+    [:div.flex.w-full.justify-center
+     (if dev?
+       [:a {:href "/api/gsi"} "Login"])]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes

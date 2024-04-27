@@ -32,8 +32,10 @@
                          :hx-encoding "multipart/form-data"}]]
       [:div.flex.items-center
        (for [{:keys [file_id]} (file/get-files req question_id)]
-         [:img {:class "w-64"
-                :src (str "/api/thumbnail/" file_id)}])]]]))
+         [:a {:href "http://localhost:8888/web/viewer.html"
+              :target "_blank"}
+          [:img {:class "w-64"
+                 :src (str "/api/thumbnail/" file_id)}]])]]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes

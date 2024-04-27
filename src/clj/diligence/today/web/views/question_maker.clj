@@ -86,7 +86,7 @@
        #(vector :option {:value %})
        question/suggestions)]
      [:div {:class "w-3/4 border rounded-lg mx-auto"}
-      [:table
+      [:table.w-full
        [:tbody
         (for [{:keys [question_id question]} questions]
           (question-ro question_id question))]]

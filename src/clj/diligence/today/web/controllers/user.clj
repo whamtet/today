@@ -1,9 +1,16 @@
 (ns diligence.today.web.controllers.user
     (:require
+      [diligence.today.env :refer [dev?]]
       [diligence.today.web.services.gsi :as gsi]))
 
+(def dev-info
+  {:email "whamtet@gmail.com"
+   :given_name "Matthew"
+   :family_name "Molloy"
+   :picture "https://lh3.googleusercontent.com/a/ACg8ocLhx96bXmR5tudqOH7skC0KdKxLgmw1FiROxCJXG6AA56SQDU6L=s96-c"})
+
 (defn upsert-user [req]
-  (when-let [info (gsi/req->user-info req)]
+  (when-let [info (if dev? dev-info (gsi/req->user-info req))]
     (first
      ((:query-fn req) :upsert-user info))))
 
