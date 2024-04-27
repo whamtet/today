@@ -26,6 +26,10 @@
 
 (defn get-file-stream [req file_id]
   (let [{:keys [filename]} (get-file req file_id)]
+    (io/input-stream (str "files/" filename))))
+
+(defn get-thumbnail-stream [req file_id]
+  (let [{:keys [filename]} (get-file req file_id)]
     (->> (.replace filename ".pdf" ".jpg")
          (str "files/thumbnails/")
          io/input-stream)))

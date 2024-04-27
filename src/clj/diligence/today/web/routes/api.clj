@@ -59,6 +59,12 @@
       (-> req :session :user_id assert)
       {:status 200
        :headers {"Content-Type" "image/jpg"}
+       :body (-> req (assoc :query-fn query-fn) (file/get-thumbnail-stream (-> req :path-params :file_id)))})]
+   ["/pdf/:file_id"
+    (fn [req]
+      (-> req :session :user_id assert)
+      {:status 200
+       :headers {"Content-Type" "application/pdf"}
        :body (-> req (assoc :query-fn query-fn) (file/get-file-stream (-> req :path-params :file_id)))})]
    ["/health"
     {:get health/healthcheck!}]])
