@@ -48,11 +48,11 @@
          "")
         [:div
          [:h3 "Hard Links"]
-         (for [{:keys [fragment_id fragment page]} (fragment/get-fragments req question_id)]
+         (for [{:keys [fragment_id fragment page]} (fragment/get-fragments req (:question_id path-params))]
            [:div.flex.mt-2 {:hx-target "this"}
             [:span {:class "w-20 text-gray-500 text-center cursor-pointer"}
              (format "(pp %s)" page)]
-            [:a {:href (href-viewer question_id page)
+            [:a {:href (href-viewer (:question_id path-params) page)
                  :target "_blank"}
              [:div {:class "w-96 truncate"} fragment]]
             [:div {:class "text-gray-500 cursor-pointer"
@@ -63,9 +63,9 @@
 (defcomponent-user ^:endpoint question-editor [req file]
   (if (simpleui/post? req)
     (iam/when-authorized
-     (file/copy-file req question_id file)
+     (file/copy-file req (:question_id path-params) file)
      response/hx-refresh)
-    (let [{question-name :question} (question/get-question req question_id)]
+    (let [{question-name :question} (question/get-question req (:question_id path-params))]
       [:div {:_ "on click add .hidden to .drop"}
        ;; header row
        [:div {:class "flex justify-center"}
@@ -74,7 +74,7 @@
         [:div.my-6.mr-4.text-gray-500.text-4xl question-name]
         (common/main-dropdown first_name)]
        [:div {:class "w-3/4 border rounded-lg mx-auto p-2"}
-        (file-selector req question_id)
+        (file-selector req (:question_id path-params))
         (fragment-selector req)]])))
 
 (defn ui-routes [{:keys [query-fn]}]

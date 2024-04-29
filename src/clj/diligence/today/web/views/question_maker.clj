@@ -22,14 +22,22 @@
          (question/add-question req project_id question)
          response/hx-refresh)))
     [:tr
-     [:td {:colspan 2}
+     [:td
       [:input {:class "w-full p-2 form-select"
+               :id (str "qe" question_id)
                :name "question"
                :value question
                :hx-post "question-edit"
                :placeholder "New question..."
                :hx-vals {:question_id question_id}
-               :list "suggestions"}]]]))
+               :list "suggestions"}]]
+     (when question_id
+           [:td
+            [:span {:class "ml-2"
+                    :hx-post "question-edit"
+                    :hx-vals {:question_id question_id}
+                    :hx-include (str "#qe" question_id)}
+             (components/button "Update")]])]))
 
 (defcomponent ^:endpoint project-edit [req project-name]
   (if (simpleui/post? req)

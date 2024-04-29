@@ -44,7 +44,7 @@
     `(simpleui/defcomponent ~name ~args
       (let [{:keys [~'session ~'path-params]} ~sym
             {:keys [~'user_id]} ~'session
-            {:keys [~'project_id ~'question_id]} ~'path-params]
+            {:keys [~'project_id]} ~'path-params]
         ~@body))
     (throw (Exception. "req ill defined"))))
 
@@ -54,7 +54,7 @@
     `(simpleui/defcomponent ~name ~args
       (let [{:keys [~'session ~'path-params]} ~sym
             {:keys [~'user_id]} ~'session
-            {:keys [~'project_id ~'question_id]} ~'path-params
+            {:keys [~'project_id]} ~'path-params
             {:keys [~'first_name]} (user/get-user ~sym)]
         ~@body))
     (throw (Exception. "req ill defined"))))
