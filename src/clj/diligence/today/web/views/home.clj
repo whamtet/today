@@ -40,7 +40,8 @@
            :src "/base_logo_transparent_background.png"}]
     [:div.flex.w-full.justify-center
      (if dev?
-       [:a {:href "/api/gsi"} "Login"])]]))
+       [:a {:href "/api/gsi"} "Login"]
+       logins)]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
