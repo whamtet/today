@@ -15,6 +15,9 @@
             (when-not (or (empty? line) (.startsWith line "#"))
                       line)))))))
 
+(defn get-question [{:keys [query-fn]} question_id]
+  (query-fn :get-question {:question_id question_id}))
+
 (defn get-questions [{:keys [query-fn]} project_id]
   (query-fn :get-questions {:project_id project_id}))
 
@@ -31,3 +34,7 @@
 (defn update-question [{:keys [query-fn]} question_id question]
   (query-fn :update-question {:question_id question_id
                               :question question}))
+
+(defn qa [req question_id]
+  (let [{:keys [question]} (get-question req question_id)]
+    {:question question}))

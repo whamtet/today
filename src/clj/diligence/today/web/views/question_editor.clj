@@ -16,26 +16,28 @@
     (iam/when-authorized
      (file/copy-file req question_id file)
      response/hx-refresh)
-    [:div {:_ "on click add .hidden to .drop"}
-     ;; header row
-     [:div {:class "flex justify-center"}
-      [:a.absolute.left-1.top-1 {:href "/"}
-       [:img.w-16.m-2 {:src "/icon.png"}]]
-      (common/main-dropdown first_name)]
-     [:div {:class "w-3/4 border rounded-lg mx-auto mt-16 p-2"}
-      [:div.mb-2 (components/button-label "add-file" "Add File")
-       [:input#add-file {:class "hidden"
-                         :type "file"
-                         :name "file"
-                         :accept "application/pdf"
-                         :hx-post "question-editor"
-                         :hx-encoding "multipart/form-data"}]]
-      [:div.flex.items-center
-       (for [{:keys [file_id]} (file/get-files req question_id)]
-         [:a {:href "http://localhost:8888/web/viewer.html"
-              :target "_blank"}
-          [:img {:class "w-64"
-                 :src (str "/api/thumbnail/" file_id)}]])]]]))
+    (let [{question-name :question} (question/get-question req question_id)]
+      [:div {:_ "on click add .hidden to .drop"}
+       ;; header row
+       [:div {:class "flex justify-center"}
+        [:a.absolute.left-1.top-1 {:href "/"}
+         [:img.w-16.m-2 {:src "/icon.png"}]]
+        [:div.my-6.mr-4.text-gray-500.text-4xl question-name]
+        (common/main-dropdown first_name)]
+       [:div {:class "w-3/4 border rounded-lg mx-auto p-2"}
+        [:div.mb-2 (components/button-label "add-file" "Add File")
+         [:input#add-file {:class "hidden"
+                           :type "file"
+                           :name "file"
+                           :accept "application/pdf"
+                           :hx-post "question-editor"
+                           :hx-encoding "multipart/form-data"}]]
+        [:div.flex.items-center
+         (for [{:keys [file_id]} (file/get-files req question_id)]
+           [:a {:href (str "http://localhost:8888/web/viewer.html?question_id=" question_id)
+                :target "_blank"}
+            [:img {:class "w-64"
+                   :src (str "/api/thumbnail/" file_id)}]])]]])))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes

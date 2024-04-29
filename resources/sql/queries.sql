@@ -31,6 +31,9 @@ select project_id from project where name = :new-project-name;
 -- :name get-project-by-id :query :one
 select name from project where project_id = :project_id;
 
+-- :name get-question :query :one
+select * from question where question_id = :question_id
+
 -- :name get-questions :query
 select * from question where project_id = :project_id;
 
