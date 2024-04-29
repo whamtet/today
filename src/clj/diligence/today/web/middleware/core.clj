@@ -6,13 +6,18 @@
 
 (def cors-headers
   {"Access-Control-Allow-Origin" "*"
-   "Access-Control-Allow-Methods" "POST, GET, OPTIONS, DELETE"})
+   "Access-Control-Allow-Methods" "POST, GET, OPTIONS, DELETE"
+   "Access-Control-Allow-Headers" "*"})
 
 (defn wrap-cors [handler]
   (fn [req]
-    (-> req
-        handler
-        (update :headers merge cors-headers))))
+    (if (-> req :request-method (= :options))
+      {:status 200
+       :headers cors-headers
+       :body ""}
+      (-> req
+          handler
+          (update :headers merge cors-headers)))))
 
 (defn wrap-base
   [{:keys [metrics site-defaults-config cookie-secret] :as opts}]

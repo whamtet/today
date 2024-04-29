@@ -3,6 +3,7 @@
    [diligence.today.web.middleware.exception :as exception]
    [diligence.today.web.middleware.formats :as formats]
    [diligence.today.web.views.home :as home]
+   [diligence.today.web.views.pdf-viewer :as pdf-viewer]
    [diligence.today.web.views.question-maker :as question-maker]
    [diligence.today.web.views.question-editor :as question-editor]
    [diligence.today.web.views.settings :as settings]
@@ -30,4 +31,5 @@
   [["" (route-data opts) (home/ui-routes opts)]
    ["/admin" (route-data opts) (settings/ui-routes opts)]
    ["/project/:project_id" (route-data opts) (question-maker/ui-routes opts)]
-   ["/project/:project_id/question/:question_id" (route-data opts) (question-editor/ui-routes opts)]])
+   ["/project/:project_id/question/:question_id" (route-data opts) (question-editor/ui-routes opts)]
+   ["/pdf-viewer" (route-data opts) (pdf-viewer/ui-routes opts)]])
