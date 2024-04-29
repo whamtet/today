@@ -8,8 +8,9 @@
 
 (defn grep [filter filename]
   (when (-> filter count (>= 3))
-        (-> (sh "grep" "-ir" filter "." :dir (str "files/grep/" (.replace filename ".pdf" "")))
-            :out
-            .trim
-            (.split "\n")
-            (->> (take 10) (map parse-line)))))
+        (some-> (sh "grep" "-ir" filter "." :dir (str "files/grep/" (.replace filename ".pdf" "")))
+                :out
+                .trim
+                not-empty
+                (.split "\n")
+                (->> (take 10) (map parse-line)))))

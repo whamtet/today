@@ -15,17 +15,19 @@
 (defcomponent ^:endpoint new-soft-link [req new-q command]
   (case command
         "search"
-        (let [{:keys [filename]} (soft-link/get-file req (:question_id path-params))]
-          [:div#link-preview {:class "text-gray-600 p-2"}
-           (for [[page result] (grep/grep new-q filename)]
-             [:a {:href (common/href-viewer (:question_id path-params) page)
-                  :target "_blank"}
-              [:div.text-gray-500 page ": " result]])])
+        (iam/when-authorized
+         (let [{:keys [filename]} (soft-link/get-file req (:question_id path-params))]
+           [:div#link-preview {:class "text-gray-600 p-2"}
+            (for [[page result] (grep/grep new-q filename)]
+              [:a {:href (common/href-viewer (:question_id path-params) page)
+                   :target "_blank"}
+               [:div.text-gray-500 page ": " result]])]))
         "create"
         (iam/when-authorized
-         (when (-> new-q count (>= 3))
-               (soft-link/insert-soft-link req (:question_id path-params) new-q)
-               response/hx-refresh))
+         (let [{:keys [filename]} (soft-link/get-file req (:question_id path-params))]
+           (when (not-empty (grep/grep new-q filename))
+                 (soft-link/insert-soft-link req (:question_id path-params) new-q)
+                 response/hx-refresh)))
         [:div
          [:div.flex
           [:input {:class "w-96 p-2 link-input"
