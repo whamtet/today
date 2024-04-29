@@ -61,6 +61,7 @@ background-color: white;"}
      (inset-disp question (fragment/get-fragments req question_id))
      [:div#modal]]))
 
+(prn 'host (host "/pdf-viewer/"))
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes-simple
     (host "/pdf-viewer/")

@@ -16,7 +16,7 @@
 (def viewer-location
   (if dev?
     "http://localhost:8888/web/viewer.html"
-    "https://app.simplifydd.com/web/viewer.html"))
+    "https://app.simplifydd.com/pdf.js/web/viewer.html"))
 
 (defn href-viewer
   ([question_id]
