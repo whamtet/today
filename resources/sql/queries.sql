@@ -65,3 +65,9 @@ select * from file where file_id = :file_id;
 
 -- :name get-fragments :query
 select * from fragment where file_id = :file_id;
+
+-- :name insert-soft-link :execute
+insert into soft_link (file_id, q) values (:file_id, :q);
+
+-- :name get-soft-links :query
+select * from soft_link where file_id = :file_id;

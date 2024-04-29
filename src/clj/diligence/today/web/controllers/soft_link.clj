@@ -2,8 +2,20 @@
     (:require
       [diligence.today.web.controllers.file :as file]))
 
-(defn get-file-id [req question_id]
-  (->> question_id (file/get-files req) first :file_id))
+(defn get-file [req question_id]
+  (->> question_id (file/get-files req) first))
 
-(defn get-soft-links [req question_id]
-  (prn (get-file-id req question_id)))
+(defmacro with-file-id [& body]
+  `(let [{:keys [~'file_id]} (get-file ~'req ~'question_id)]
+    ~@body))
+
+(defn get-soft-links [{:keys [query-fn] :as req} file_id]
+  (->>
+   (query-fn :get-soft-links {:file_id file_id})
+   (map :q)
+   sort))
+
+(defn insert-soft-link [req question_id q]
+  (with-file-id
+   ((:query-fn req) :insert-soft-link {:question_id question_id
+                                       :q q})))

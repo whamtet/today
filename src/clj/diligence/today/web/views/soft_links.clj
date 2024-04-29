@@ -4,6 +4,7 @@
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.controllers.soft-link :as soft-link]
       [diligence.today.web.htmx :refer [defcomponent]]
+      [diligence.today.web.services.grep :as grep]
       [diligence.today.web.views.common :as common]
       [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]
@@ -12,8 +13,12 @@
       [simpleui.response :as response]))
 
 (defcomponent ^:endpoint soft-links [req fragment_id command]
-  (case command
-        [:div
-         [:h3 "Soft Links"]
-         (for [{:keys [fragment_id fragment page]} (soft-link/get-soft-links req (:question_id path-params))]
-           [:div])]))
+  (let [{:keys [file_id filename]} (soft-link/get-file req (:question_id path-params))]
+    (case command
+          [:div
+           [:h3 "Soft Links"]
+           (for [q (soft-link/get-soft-links req file_id)]
+             (let [results (grep/grep q filename)]
+               [:div [:h4 q]
+                (for [result results]
+                  [:div.text-gray-500 result])]))])))

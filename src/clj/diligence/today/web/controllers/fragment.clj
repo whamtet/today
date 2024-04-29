@@ -1,11 +1,7 @@
 (ns diligence.today.web.controllers.fragment
     (:require
       [diligence.today.util :refer [mk]]
-      [diligence.today.web.controllers.soft-link :as soft-link]))
-
-(defmacro with-file-id [& body]
-  `(let [~'file_id (soft-link/get-file-id ~'req ~'question_id)]
-    ~@body))
+      [diligence.today.web.controllers.soft-link :refer [with-file-id]]))
 
 (defn upsert-fragment [{:keys [query-fn] :as req} fragment_id question_id fragment page]
   (with-file-id
