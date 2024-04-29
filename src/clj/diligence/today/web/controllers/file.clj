@@ -8,10 +8,42 @@
 (def files (File. "files"))
 (.mkdirs (File. "files/thumbnails"))
 
+(defn- num-pages [filename]
+  (->> (sh "pdftotext" "-f" "10000" (str "files/" filename))
+      :err
+       (re-find #"(\d+)\)\.")
+       second
+       Long/parseLong))
+
+(defn- grep-dir [filename]
+  (->> (.replace filename ".pdf" "")
+       (str "files/grep/")
+       File.
+       .mkdirs))
+
+(defn- text-file [filename i]
+  (format "files/grep/%s/%03d.txt"
+          (.replace filename ".pdf" "")
+          i))
+
+(defn- convert-page [filename]
+  (fn [i]
+    (sh "pdftotext"
+        "-f" (str i)
+        "-l" (str i)
+        "-layout"
+        (str "files/" filename)
+        (text-file filename i))))
+
+(defn- convert-pages [filename]
+  (grep-dir filename)
+  (->> filename num-pages inc (range 1) (map (convert-page filename)) dorun))
+
 (defn copy-file [{:keys [query-fn]} question_id {:keys [tempfile filename]}]
   (let [f (File. files filename)]
     (when-not (.exists f)
               (io/copy tempfile f)
+              (convert-pages filename)
               (sh "convert"
                   (format "files/%s[0]" filename)
                   (format "files/thumbnails/%s"
