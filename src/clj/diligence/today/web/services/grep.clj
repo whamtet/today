@@ -11,4 +11,4 @@
       :out
       .trim
       (.split "\n")
-      (->> (map parse-line))))
+      (->> (take 10) (map parse-line))))

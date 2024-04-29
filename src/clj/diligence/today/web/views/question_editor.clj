@@ -10,6 +10,7 @@
       [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]
       [diligence.today.web.views.icons :as icons]
+      [diligence.today.web.views.soft-links :as soft-links]
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 
@@ -46,7 +47,7 @@
         (iam/when-authorized
          (fragment/delete-fragment req fragment_id)
          "")
-        [:div
+        [:div.mb-2
          [:h3 "Hard Links"]
          (for [{:keys [fragment_id fragment page]} (fragment/get-fragments req (:question_id path-params))]
            [:div.flex.mt-2 {:hx-target "this"}
@@ -75,7 +76,8 @@
         (common/main-dropdown first_name)]
        [:div {:class "w-3/4 border rounded-lg mx-auto p-2"}
         (file-selector req (:question_id path-params))
-        (fragment-selector req)]])))
+        (fragment-selector req)
+        (soft-links/soft-links req)]])))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
