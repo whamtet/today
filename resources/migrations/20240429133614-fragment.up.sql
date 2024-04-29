@@ -2,8 +2,8 @@
 create table fragment
 (
     fragment_id    string primary key,
-    question_id    integer,
+    file_id    integer,
     fragment       text,
     page           integer,
-    foreign key(question_id) references question(question_id)
+    foreign key(file_id) references file(file_id)
 );

@@ -10,8 +10,8 @@ pic = :picture
 returning user_id;
 
 -- :name upsert-fragment :execute
-insert into fragment (fragment_id, question_id, fragment, page)
-values (:fragment_id, :question_id, :fragment, :page)
+insert into fragment (fragment_id, file_id, fragment, page)
+values (:fragment_id, :file_id, :fragment, :page)
 on conflict(fragment_id)
 do update
 set fragment = :fragment,
@@ -64,4 +64,4 @@ select * from file where question_id = :question_id;
 select * from file where file_id = :file_id;
 
 -- :name get-fragments :query
-select * from fragment where question_id = :question_id;
+select * from fragment where file_id = :file_id;
