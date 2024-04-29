@@ -12,13 +12,52 @@
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 
-(defcomponent ^:endpoint soft-links [req fragment_id command]
+(defcomponent ^:endpoint new-soft-link [req new-q command]
+  (case command
+        "search"
+        (let [{:keys [filename]} (soft-link/get-file req (:question_id path-params))]
+          [:div#link-preview {:class "text-gray-600 p-2"}
+           (for [[page result] (grep/grep new-q filename)]
+             [:a {:href (common/href-viewer (:question_id path-params) page)
+                  :target "_blank"}
+              [:div.text-gray-500 page ": " result]])])
+        "create"
+        (iam/when-authorized
+         (when (-> new-q count (>= 3))
+               (soft-link/insert-soft-link req (:question_id path-params) new-q)
+               response/hx-refresh))
+        [:div
+         [:div.flex
+          [:input {:class "w-96 p-2 link-input"
+                   :name "new-q"
+                   :placeholder "New Soft Link..."
+                   :hx-get "new-soft-link:search"
+                   :hx-trigger "keyup changed delay:0.5s"
+                   :hx-target "#link-preview"}]
+          [:div {:class "ml-2"
+                 :hx-post "new-soft-link:create"
+                 :hx-include ".link-input"}
+           (components/button "Add Link")]]
+         [:div#link-preview]]))
+
+(defcomponent ^:endpoint soft-links [req command q]
   (let [{:keys [file_id filename]} (soft-link/get-file req (:question_id path-params))]
     (case command
+          "del"
+          (iam/when-authorized
+           (soft-link/delete-soft-link req (:question_id path-params) q)
+           response/hx-refresh)
           [:div
-           [:h3 "Soft Links"]
+           [:h3.mb-3 "Soft Links"]
            (for [q (soft-link/get-soft-links req file_id)]
              (let [results (grep/grep q filename)]
-               [:div [:h4 q]
-                (for [result results]
-                  [:div.text-gray-500 result])]))])))
+               [:div [:h4.flex q [:span {:class "text-gray-500 ml-2 cursor-pointer"
+                                         :hx-delete "soft-links:del"
+                                         :hx-vals {:q q}}
+                                  icons/trash]]
+                (for [[page result] results]
+                  [:a {:href (common/href-viewer (:question_id path-params) page)
+                       :target "_blank"}
+                   [:div.text-gray-500 page ": " result]])]))
+           [:hr.my-3.border]
+           (new-soft-link req)])))

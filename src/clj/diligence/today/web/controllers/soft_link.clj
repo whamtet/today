@@ -17,5 +17,9 @@
 
 (defn insert-soft-link [req question_id q]
   (with-file-id
-   ((:query-fn req) :insert-soft-link {:question_id question_id
+   ((:query-fn req) :insert-soft-link {:file_id file_id
                                        :q q})))
+
+(defn delete-soft-link [req question_id q]
+  (with-file-id
+   ((:query-fn req) :delete-soft-link {:q q :file_id file_id})))

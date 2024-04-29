@@ -6,24 +6,13 @@
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [page-htmx defcomponent defcomponent-user]]
-      [diligence.today.web.views.common :as common]
+      [diligence.today.web.views.common :as common :refer [href-viewer]]
       [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]
       [diligence.today.web.views.icons :as icons]
       [diligence.today.web.views.soft-links :as soft-links]
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
-
-(def viewer-location
-  (if dev?
-    "http://localhost:8888/web/viewer.html"
-    "https://app.simplifydd.com/pdf.js/web/viewer.html"))
-
-(defn href-viewer
-  ([question_id]
-   (format "%s?question_id=%s" viewer-location question_id))
-  ([question_id page]
-   (format "%s?question_id=%s&page=%s" viewer-location question_id page)))
 
 (defn file-selector [req question_id]
   (list

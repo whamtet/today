@@ -7,8 +7,9 @@
     [(Long/parseLong page-num) (.trim content)]))
 
 (defn grep [filter filename]
-  (-> (sh "grep" "-ir" filter "." :dir (str "files/grep/" (.replace filename ".pdf" "")))
-      :out
-      .trim
-      (.split "\n")
-      (->> (take 10) (map parse-line))))
+  (when (-> filter count (>= 3))
+        (-> (sh "grep" "-ir" filter "." :dir (str "files/grep/" (.replace filename ".pdf" "")))
+            :out
+            .trim
+            (.split "\n")
+            (->> (take 10) (map parse-line)))))
