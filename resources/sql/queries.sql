@@ -9,6 +9,14 @@ last_name = :family_name,
 pic = :picture
 returning user_id;
 
+-- :name upsert-fragment :execute
+insert into fragment (fragment_id, question_id, fragment, page)
+values (:fragment_id, :question_id, :fragment, :page)
+on conflict(fragment_id)
+do update
+set fragment = :fragment,
+page = :page;
+
 -- :name get-user-by-id :query :one
 select * from user where user_id = :user_id;
 
@@ -32,7 +40,7 @@ select project_id from project where name = :new-project-name;
 select name from project where project_id = :project_id;
 
 -- :name get-question :query :one
-select * from question where question_id = :question_id
+select * from question where question_id = :question_id;
 
 -- :name get-questions :query
 select * from question where project_id = :project_id;
@@ -50,7 +58,10 @@ update question set question = :question where question_id = :question_id;
 insert into file (question_id, filename) values (:question_id, :filename);
 
 -- :name get-files :query
-select * from file where question_id = :question_id
+select * from file where question_id = :question_id;
 
 -- :name get-file :query :one
-select * from file where file_id = :file_id
+select * from file where file_id = :file_id;
+
+-- :name get-fragments :query
+select * from fragment where question_id = :question_id;

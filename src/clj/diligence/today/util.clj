@@ -7,3 +7,6 @@
 
 (defmacro defm-dev [sym & rest]
   `(def ~sym ((if dev? identity memoize) (fn ~@rest))))
+
+(defmacro mk [& syms]
+  (zipmap (map keyword syms) syms))
