@@ -17,4 +17,4 @@
 (def dev? true)
 (def prod? false)
 (defn host [s]
-  (str "https://diligence.today" s))
+  (str "http://localhost:3000" s))

@@ -1,5 +1,6 @@
 (ns diligence.today.web.views.pdf-viewer
     (:require
+      [diligence.today.env :refer [host]]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.fragment :as fragment]
       [diligence.today.web.controllers.question :as question]
@@ -35,12 +36,21 @@ background-color: white;"}
    [:div
     (map fragment-row fragments)]])
 
+(defn- parse-search [s]
+  (into {}
+        (for [kv (.split s "&")]
+          (let [[k v] (.split kv "=")]
+            [(keyword k)
+             (if (re-find #"^\d" v)
+               (Long/parseLong v)
+               v)]))))
+
 (defcomponent ^:endpoint inset [{:keys [headers] :as req}
                                fragment
                                fragmentId
                                page
                                command]
-  (let [question_id (-> "hx-current-url" headers (.split "=") last Long/parseLong)
+  (let [{:keys [question_id]} (-> "hx-current-url" headers (.split "\\?") last parse-search)
         _ (case command
                 "add" (fragment/upsert-fragment
                        req fragmentId question_id fragment page)
@@ -53,6 +63,6 @@ background-color: white;"}
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes-simple
-    "http://localhost:3000/pdf-viewer/"
+    (host "/pdf-viewer/")
     [query-fn]
     inset))
