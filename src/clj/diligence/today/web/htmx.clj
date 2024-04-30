@@ -55,6 +55,6 @@
       (let [{:keys [~'session ~'path-params]} ~sym
             {:keys [~'user_id]} ~'session
             {:keys [~'project_id]} ~'path-params
-            {:keys [~'first_name]} (user/get-user ~sym)]
+            {:keys [~'first_name]} (user/get-user-exception ~sym)]
         ~@body))
     (throw (Exception. "req ill defined"))))

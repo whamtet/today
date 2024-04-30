@@ -16,3 +16,7 @@
 
 (defn get-user [{:keys [query-fn session]}]
   (query-fn :get-user-by-id session))
+
+(defn get-user-exception [req]
+  (or (get-user req)
+      (throw (ex-info "logged-out" {:type :logged-out}))))

@@ -1,7 +1,8 @@
 (ns diligence.today.web.middleware.exception
   (:require
     [clojure.tools.logging :as log]
-    [reitit.ring.middleware.exception :as exception]))
+    [reitit.ring.middleware.exception :as exception]
+    [simpleui.response :as response]))
 
 (defn handler [message status exception request]
   (when (>= status 500)
@@ -13,6 +14,9 @@
             :data      (ex-data exception)
             :uri       (:uri request)}})
 
+(defn logged-out-handler [exception request]
+  (assoc (response/redirect "/") :session {}))
+
 (def wrap-exception
   (exception/create-exception-middleware
     (merge
@@ -22,6 +26,7 @@
        :system.exception/not-found    (partial handler "not found" 404)
        :system.exception/unauthorized (partial handler "unauthorized" 401)
        :system.exception/forbidden    (partial handler "forbidden" 403)
+       :logged-out logged-out-handler
 
        ;; override the default handler
        ::exception/default            (partial handler "default" 500)
