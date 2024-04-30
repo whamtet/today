@@ -9,6 +9,7 @@
       [diligence.today.web.views.common :as common :refer [href-viewer]]
       [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]
+      [diligence.today.web.views.editor :as editor]
       [diligence.today.web.views.icons :as icons]
       [diligence.today.web.views.soft-links :as soft-links]
       [simpleui.core :as simpleui]
@@ -64,9 +65,8 @@
         [:div.my-6.mr-4.text-gray-500.text-4xl question-name]
         (common/main-dropdown first_name)]
        [:div {:class "w-3/4 border rounded-lg mx-auto p-2"}
-        (file-selector req (:question_id path-params))
-        (fragment-selector req)
-        (soft-links/soft-links req)]])))
+        (editor/editor req)
+        [:div "hi"]]])))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
@@ -75,6 +75,7 @@
    (fn [req]
      (if (-> req :session :user_id)
        (page-htmx
-        {:hyperscript? true}
+        {:hyperscript? true
+         :js ["/editor.js"]}
         (-> req (assoc :query-fn query-fn) question-editor))
        (response/redirect "/")))))

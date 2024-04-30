@@ -14,9 +14,6 @@
     (first
      ((:query-fn req) :upsert-user info))))
 
-(defn get-user [{:keys [query-fn session]}]
-  (query-fn :get-user-by-id session))
-
-(defn get-user-exception [req]
-  (or (get-user req)
+(defn get-user-exception [{:keys [query-fn session]}]
+  (or (query-fn :get-user-by-id session)
       (throw (ex-info "logged-out" {:type :logged-out}))))

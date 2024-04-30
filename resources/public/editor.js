@@ -1,0 +1,24 @@
+const $ = x => document.querySelector(x);
+const $$ = x => document.querySelectorAll(x);
+
+const isText = el => el.nodeType === el.TEXT_NODE;
+
+const marker = () => document.createTextNode('fuck');
+
+const insertMarker = (el, offset) => {
+    if (isText(el)) {
+        const after = el.splitText(offset);
+        el.parentNode.insertBefore(marker(), after);
+    } else if (offset === el.childNodes.length) {
+        el.appendChild(marker());
+    } else {
+        el.insertBefore(marker(), el.childNodes[offset]);
+    }
+}
+
+const insertRange = () => {
+    const selection = getSelection();
+    if (selection) {
+        insertMarker(selection.focusNode, selection.focusOffset);
+    }
+}
