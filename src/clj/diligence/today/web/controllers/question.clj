@@ -38,3 +38,8 @@
 (defn qa [req question_id]
   (let [{:keys [question]} (get-question req question_id)]
     {:question question}))
+
+(defn get-suggestions [req project_id]
+  (remove
+   (->> (get-questions req project_id) (map :question) set)
+   suggestions))

@@ -1,5 +1,6 @@
 (ns diligence.today.web.views.question-maker
     (:require
+      [diligence.today.util :as util]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.project :as project]
       [diligence.today.web.controllers.question :as question]
@@ -19,8 +20,13 @@
          (question/update-question req question_id question)
          response/hx-refresh)
         (iam/when-authorized
-         (question/add-question req project_id question)
-         response/hx-refresh)))
+         (try
+           (question/add-question req project_id question)
+           response/hx-refresh
+           (catch clojure.lang.ExceptionInfo e
+             (if (util/uniqueness-violation? e)
+               [:div#duplicate-warning.my-2 (components/warning "Name taken")]
+               (throw e)))))))
     [:tr
      [:td
       [:input {:class "w-full p-2 form-select"
@@ -30,12 +36,14 @@
                :hx-post "question-edit"
                :placeholder "New question..."
                :hx-vals {:question_id question_id}
+               :hx-target "#duplicate-warning"
                :list "suggestions"}]]
      (when question_id
            [:td
             [:span {:class "ml-2"
                     :hx-post "question-edit"
                     :hx-vals {:question_id question_id}
+                    :hx-target "#duplicate-warning"
                     :hx-include (str "#qe" question_id)}
              (components/button "Update")]])]))
 
@@ -92,13 +100,14 @@
      [:datalist#suggestions
       (map
        #(vector :option {:value %})
-       question/suggestions)]
+       (question/get-suggestions req project_id))]
      [:div {:class "w-3/4 border rounded-lg mx-auto"}
       [:table.w-full
        [:tbody
         (for [{:keys [question_id question]} questions]
           (question-ro question_id question))]]
       [:hr.mt-4.border]
+      [:div#duplicate-warning]
       (question-edit req nil nil)]]))
 
 (defn ui-routes [{:keys [query-fn]}]

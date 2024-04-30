@@ -1,5 +1,6 @@
 (ns diligence.today.web.views.project-selector
     (:require
+      [diligence.today.util :as util]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.project :as project]
       [diligence.today.web.htmx :refer [defcomponent-user]]
@@ -8,9 +9,6 @@
       [diligence.today.web.views.dropdown :as dropdown]
       [simpleui.response :as response]))
 
-(defn- uniqueness-violation? [e]
-  (-> e str (.contains "SQLITE_CONSTRAINT_UNIQUE")))
-
 (defcomponent-user ^:endpoint project-selector [req command new-project-name]
   (case command
         "new" (iam/when-authorized
@@ -18,7 +16,7 @@
                  (let [project_id (project/create-project req new-project-name)]
                    (response/hx-redirect (format "/project/%s/" project_id)))
                  (catch clojure.lang.ExceptionInfo e
-                   (if (uniqueness-violation? e)
+                   (if (util/uniqueness-violation? e)
                      [:div#unique-warning.my-3 (components/warning "Project name in use.")]
                      (throw e)))))
         [:div {:_ "on click add .hidden to .drop"}

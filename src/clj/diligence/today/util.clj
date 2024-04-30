@@ -10,3 +10,6 @@
 
 (defmacro mk [& syms]
   (zipmap (map keyword syms) syms))
+
+(defn uniqueness-violation? [e]
+  (-> e str (.contains "SQLITE_CONSTRAINT_UNIQUE")))
