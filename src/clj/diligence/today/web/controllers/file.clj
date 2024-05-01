@@ -1,12 +1,14 @@
 (ns diligence.today.web.controllers.file
     (:require
       [clojure.java.io :as io]
-      [clojure.java.shell :refer [sh]])
+      [clojure.java.shell :refer [sh]]
+      [diligence.today.web.services.thumbnail :as thumbnail]
+      [diligence.today.util :refer [mk]])
     (:import
       java.io.File))
 
 (def files (File. "files"))
-(.mkdirs (File. "files/thumbnails"))
+(.mkdir files)
 
 (defn- num-pages [filename]
   (->> (sh "pdftotext" "-f" "10000" (str "files/" filename))
@@ -35,23 +37,21 @@
         (str "files/" filename)
         (text-file filename i))))
 
-(defn- convert-pages [filename]
+(defn- convert-pages [filename limit]
   (grep-dir filename)
-  (->> filename num-pages inc (range 1) (map (convert-page filename)) dorun))
+  (->> limit inc (range 1) (map (convert-page filename)) dorun future))
 
-(defn copy-file [{:keys [query-fn]} question_id {:keys [tempfile filename]}]
+(defn copy-file [{:keys [query-fn]} project_id {:keys [tempfile filename]}]
   (let [f (File. files filename)]
     (when-not (.exists f)
               (io/copy tempfile f)
-              (convert-pages filename)
-              (sh "convert"
-                  (format "files/%s[0]" filename)
-                  (format "files/thumbnails/%s"
-                          (.replace filename ".pdf" ".jpg"))))
-    (query-fn :insert-file {:question_id question_id :filename filename})))
+              (let [limit (num-pages filename)]
+                (convert-pages filename limit)
+                (thumbnail/thumbnails filename limit)))
+    (query-fn :insert-file (mk project_id filename))))
 
-(defn get-files [{:keys [query-fn]} question_id]
-  (query-fn :get-files {:question_id question_id}))
+(defn get-files [{:keys [query-fn]} project_id]
+  (query-fn :get-files {:project_id project_id}))
 
 (defn get-file [{:keys [query-fn]} file_id]
   (query-fn :get-file {:file_id file_id}))
@@ -62,6 +62,5 @@
 
 (defn get-thumbnail-stream [req file_id]
   (let [{:keys [filename]} (get-file req file_id)]
-    (->> (.replace filename ".pdf" ".jpg")
-         (str "files/thumbnails/")
-         io/input-stream)))
+    (io/input-stream
+     (thumbnail/thumbnail-file filename 0))))

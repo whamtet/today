@@ -20,7 +20,7 @@
     "https://app.simplifydd.com/pdf.js/web/viewer.html"))
 
 (defn href-viewer
-  ([question_id]
-   (format "%s?question_id=%s" viewer-location question_id))
-  ([question_id page]
-   (format "%s?question_id=%s&page=%s" viewer-location question_id page)))
+  ([project_id]
+   (format "%s?project_id=%s" viewer-location project_id))
+  ([project_id page]
+   (format "%s?project_id=%s&page=%s" viewer-location project_id page)))

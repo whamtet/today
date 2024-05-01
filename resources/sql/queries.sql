@@ -44,10 +44,10 @@ insert into question (project_id, question) values (:project_id, :question);
 update question set question = :question where question_id = :question_id;
 
 -- :name insert-file :execute
-insert into file (question_id, filename) values (:question_id, :filename);
+insert into file (project_id, filename) values (:project_id, :filename);
 
 -- :name get-files :query
-select * from file where question_id = :question_id;
+select * from file where project_id = :project_id
 
 -- :name get-file :query :one
 select * from file where file_id = :file_id;
