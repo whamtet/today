@@ -63,19 +63,24 @@
               :type "submit"
               :value "Save"}]]))
 
-(defn question-ro [question_id question]
-  [:tr {:hx-target "this"}
-   [:td.p-2 question]
-   [:td.p-2
-    [:div.flex.items-center
-     [:span {:hx-get "question-edit"
-             :hx-vals {:question_id question_id :question question}}
-      (components/button "Edit")]
-     [:a {:class "bg-clj-blue p-1.5 rounded-lg text-white text-center w-24 mx-2"
-          :href (format "question/%s/" question_id)} "Explore..."]
-     [:span {:class "opacity-50 cursor-pointer"
-             :onclick "alert('Delete under menu -> Config...')"}
-      icons/trash]]]])
+(defcomponent ^:endpoint question-ro [req question_id question]
+  (if (simpleui/delete? req)
+    (iam/when-authorized
+     (question/delete-question req question_id)
+     response/hx-refresh)
+    [:tr {:hx-target "this"}
+     [:td.p-2 question]
+     [:td.p-2
+      [:div.flex.items-center
+       [:span {:class "mr-2"
+               :hx-get "question-edit"
+               :hx-vals {:question_id question_id :question question}}
+        (components/button "Edit Question")]
+       [:span {:class "opacity-50 cursor-pointer"
+               :hx-delete "question-ro"
+               :hx-confirm "Delete question? Cannot be undone."
+               :hx-vals {:question_id question_id}}
+        icons/trash]]]]))
 
 (defn project-ro [project-name]
   [:form {:class "flex items-center"
@@ -105,7 +110,7 @@
       [:table.w-full
        [:tbody
         (for [{:keys [question_id question]} questions]
-          (question-ro question_id question))]]
+          (question-ro req question_id question))]]
       [:hr.mt-4.border]
       [:div#duplicate-warning]
       (question-edit req nil nil)]]))

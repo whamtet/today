@@ -11,7 +11,7 @@
      (str "Welcome " user_name)
      (list
       (when project_id
-            [:a {:href (format "/project/%s/admin/" project_id)} [:div.p-2 "Config..."]])
+            [:a {:href (format "/project/%s/admin/" project_id)} [:div.p-2 "Project Config..."]])
       [:div.p-2.cursor-pointer {:hx-post "/api/logout"} "Logout"]))]))
 
 (def viewer-location

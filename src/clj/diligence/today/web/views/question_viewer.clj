@@ -1,4 +1,4 @@
-(ns diligence.today.web.views.settings
+(ns diligence.today.web.views.question-viewer
     (:require
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.project :as project]
@@ -24,19 +24,21 @@
        (components/button "Delete")]]]))
 
 (defcomponent-user ^:endpoint question-maker [req]
-  (let [questions (question/get-questions-all req)]
+  (let [questions (question/get-questions req project_id)]
     [:div {:class "mt-12"
            :_ "on click add .hidden to .drop"}
      ;; header row
      [:div
       [:a.absolute.left-1.top-1 {:href "/"}
        [:img.w-16.m-2 {:src "/icon.png"}]]
-      (common/main-dropdown first_name)]
+      (common/main-dropdown first_name project_id)]
      [:div {:class "w-3/4 border rounded-lg mx-auto"}
-      [:table
-       [:tbody
-        (for [{:keys [question_id question]} questions]
-          (question-row req question_id question))]]]]))
+      (if (empty? questions)
+        [:div.text-gray-500.m-2 "Ask your admin to create questions"]
+        [:table
+         [:tbody
+          (for [{:keys [question_id question]} questions]
+            (question-row req question_id question))]])]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes

@@ -21,9 +21,6 @@
 (defn get-questions [{:keys [query-fn]} project_id]
   (query-fn :get-questions {:project_id project_id}))
 
-(defn get-questions-all [{:keys [query-fn]}]
-  (query-fn :get-questions-all {}))
-
 (defn delete-question [{:keys [query-fn]} question_id]
   (query-fn :delete-question {:question_id question_id}))
 
