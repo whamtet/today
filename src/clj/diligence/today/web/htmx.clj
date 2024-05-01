@@ -19,7 +19,7 @@
     s))
 
 (defn- scripts [{:keys [js hyperscript? google?]}]
-  (cond-> (map #(vector :script {:src %}) js)
+  (cond-> (map #(vector :script {:src (resource-cache/cache-suffix %)}) js)
           hyperscript? (conj
                         [:script {:src (unminify "https://unpkg.com/hyperscript.org@0.9.12/dist/_hyperscript.min.js")}])
           google? (conj [:script {:src "https://accounts.google.com/gsi/client" :async true :defer true}])))

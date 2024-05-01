@@ -43,6 +43,9 @@ insert into question (project_id, question) values (:project_id, :question);
 -- :name update-question :execute
 update question set question = :question where question_id = :question_id;
 
+-- :name update-editor :execute
+update question set editor = :editor where question_id = :question_id;
+
 -- :name insert-file :execute
 insert into file (project_id, filename) values (:project_id, :filename);
 

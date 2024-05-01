@@ -23,3 +23,14 @@ const insertRange = () => {
         insertMarker(selection.focusNode, selection.focusOffset);
     }
 }
+
+document.onselectionchange = () => {
+    const selection = getSelection();
+    if (selection) {
+        $('#add-reference').disabled = !isSubeditor(selection.anchorNode) || !isSubeditor(selection.focusNode);
+    }
+}
+
+const addReference = () => {
+    console.log('add reference');
+}

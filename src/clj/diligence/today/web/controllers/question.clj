@@ -32,11 +32,16 @@
   (query-fn :update-question {:question_id question_id
                               :question question}))
 
-(defn qa [req question_id]
-  (let [{:keys [question]} (get-question req question_id)]
-    {:question question}))
-
 (defn get-suggestions [req project_id]
   (remove
    (->> (get-questions req project_id) (map :question) set)
    suggestions))
+
+(defn get-editor [req question_id]
+  (some-> (get-question req question_id)
+          :editor
+          read-string))
+
+(defn update-editor [{:keys [query-fn]} question_id editor]
+  (query-fn :update-editor {:question_id question_id
+                            :editor (pr-str editor)}))
