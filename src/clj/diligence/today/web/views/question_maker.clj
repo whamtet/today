@@ -96,7 +96,7 @@
       [:a.absolute.left-1.top-1 {:href "/"}
        [:img.w-16.m-2 {:src "/icon.png"}]]
       (project-ro project-name)
-      (common/main-dropdown first_name)]
+      (common/main-dropdown first_name project_id)]
      [:datalist#suggestions
       (map
        #(vector :option {:value %})

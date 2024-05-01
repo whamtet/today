@@ -29,7 +29,7 @@
 (defmethod ig/init-key :reitit.routes/ui
   [_ opts]
   [["" (route-data opts) (home/ui-routes opts)]
-   ["/admin" (route-data opts) (settings/ui-routes opts)]
    ["/project/:project_id" (route-data opts) (question-maker/ui-routes opts)]
+   ["/project/:project_id/admin" (route-data opts) (settings/ui-routes opts)]
    ["/project/:project_id/question/:question_id" (route-data opts) (question-editor/ui-routes opts)]
    ["/pdf-viewer" (route-data opts) (pdf-viewer/ui-routes opts)]])
