@@ -42,6 +42,18 @@
           :editor
           read-string))
 
-(defn update-editor [{:keys [query-fn]} question_id editor]
+(defn- set-editor [{:keys [query-fn]} question_id editor]
   (query-fn :update-editor {:question_id question_id
                             :editor (pr-str editor)}))
+
+(defn- update-editor [req question_id f & args]
+  (set-editor
+   req
+   question_id
+   (apply f (get-editor req question_id) args)))
+
+(defn update-editor-text [req question_id text]
+  (update-editor req question_id assoc :text text))
+
+(defn assoc-reference [req question_id reference]
+  (update-editor req question_id assoc-in [:references (:offset reference)] reference))

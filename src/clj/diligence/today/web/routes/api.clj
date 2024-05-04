@@ -2,6 +2,7 @@
   (:require
     [diligence.today.web.controllers.file :as file]
     [diligence.today.web.controllers.health :as health]
+    [diligence.today.web.controllers.question :as question]
     [diligence.today.web.controllers.user :as user]
     [diligence.today.web.middleware.exception :as exception]
     [diligence.today.web.middleware.formats :as formats]
@@ -34,6 +35,11 @@
                   ;; exception handling
                 exception/wrap-exception]})
 
+(def ok
+  {:status 200
+   :headers {}
+   :body ""})
+
 ;; Routes
 (defn api-routes [{:keys [query-fn]}]
   [["/swagger.json"
@@ -53,7 +59,16 @@
     (fn [req]
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (-> req :session #_(dissoc :reitit.core/match :reitit.core/router) pr-str)})]
+       :body (-> req (dissoc :reitit.core/match :reitit.core/router) pr-str)})]
+   ;; todo auth
+   ["/question/:question_id/reference"
+    (fn [req]
+      (question/assoc-reference
+       (assoc req :query-fn query-fn)
+       (-> req :path-params :question_id Long/parseLong)
+       (-> req :body-params (update :offset #(Long/parseLong %))))
+      ok)]
+   ;; retrievals
    ["/thumbnail/:file_id"
     (fn [req]
       (-> req :session :user_id assert)

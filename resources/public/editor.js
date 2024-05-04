@@ -53,6 +53,13 @@ document.onselectionchange = () => {
 const addReference = () => {
     const selection = getSelection();
     if (selection) {
+        // first save the text
+        const values = {
+            command: 'text',
+            text: $('#editor').innerText
+        };
+        htmx.ajax('POST', 'editor', {values});
+        // next open window
         const offset = getIndex(trailingNode(selection));
         const params = new URLSearchParams({offset, question_id});
         const q = selection.toString().trim();

@@ -20,10 +20,15 @@
             disabled:bg-gray-400"}
    label])
 
-(defcomponent editor [req]
-  (let [{:keys [text]} (get-editor req (:question_id path-params))]
-    [:div
-     [:script (format "question_id = %s" (:question_id path-params))]
-     (button "add-reference" "Add reference..." "addReference()")
-     [:div#editor.mt-2.p-2.border {:contenteditable "true"}
-      (or text "Write your answer here...")]]))
+(defcomponent ^:endpoint editor [req text command]
+  (case command
+        "text"
+        (iam/when-authorized
+         (question/update-editor-text req (:question_id path-params) text)
+         nil)
+        (let [{:keys [text]} (get-editor req (:question_id path-params))]
+          [:div
+           [:script (format "question_id = %s" (:question_id path-params))]
+           (button "add-reference" "Add reference..." "addReference()")
+           [:div#editor.mt-2.p-2.border {:contenteditable "true"}
+            (or text "Write your answer here...")]])))
