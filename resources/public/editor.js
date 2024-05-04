@@ -69,3 +69,10 @@ const addReference = () => {
         window.open(viewerHref + '?' + params.toString());
     }
 }
+
+// refresh for references
+window.onmessage = ({data}) => {
+    if (data === 'refresh') {
+        location.reload();
+    }
+}
