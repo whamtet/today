@@ -8,7 +8,7 @@
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 
-(defcomponent-user ^:endpoint question-editor [req file]
+(defcomponent-user answer [req file]
   (let [{question-name :question} (question/get-question req (:question_id path-params))]
     [:div {:_ "on click add .hidden to .drop"}
      ;; header row
@@ -29,5 +29,5 @@
        (page-htmx
         {:hyperscript? true
          :js ["/editor.js"]}
-        (-> req (assoc :query-fn query-fn) question-editor))
+        (-> req (assoc :query-fn query-fn) answer))
        (response/redirect "/")))))

@@ -16,12 +16,14 @@
             :type "button"
             :onclick onclick
             :disabled true
-            :class "bg-clj-blue py-1.5 px-3 rounded-lg text-white"}
+            :class "bg-clj-blue py-1.5 px-3 rounded-lg text-white
+            disabled:bg-gray-400"}
    label])
 
-(defcomponent ^:endpoint editor [req]
+(defcomponent editor [req]
   (let [{:keys [text]} (get-editor req (:question_id path-params))]
     [:div
+     [:script (format "question_id = %s" (:question_id path-params))]
      (button "add-reference" "Add reference..." "addReference()")
      [:div#editor.mt-2.p-2.border {:contenteditable "true"}
       (or text "Write your answer here...")]]))
