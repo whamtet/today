@@ -13,3 +13,6 @@
 
 (defn uniqueness-violation? [e]
   (-> e str (.contains "SQLITE_CONSTRAINT_UNIQUE")))
+
+(defn key-by [f s]
+  (zipmap (map f s) s))

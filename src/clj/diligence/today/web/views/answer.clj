@@ -28,6 +28,6 @@
      (if (-> req :session :user_id)
        (page-htmx
         {:hyperscript? true
-         :js ["/editor.js"]}
+         :js ["/editor.js" "/editor_value.js"]}
         (-> req (assoc :query-fn query-fn) answer))
        (response/redirect "/")))))

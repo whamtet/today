@@ -1,6 +1,7 @@
 (ns diligence.today.web.controllers.question
     (:require
-      [clojure.java.io :as io]))
+      [clojure.java.io :as io]
+      [diligence.today.util :as util]))
 
 (def suggestions
   (-> "suggestions.txt"
@@ -52,8 +53,19 @@
    question_id
    (apply f (get-editor req question_id) args)))
 
-(defn update-editor-text [req question_id text]
-  (update-editor req question_id assoc :text text))
+(defn- move-references [references movements]
+  (->> references
+       vals
+       (keep
+        #(when-let [new-offset (-> % :offset movements)]
+          (assoc % :offset new-offset)))
+       (util/key-by :offset)))
+
+(defn update-editor-text [req question_id text movements]
+  (update-editor
+   req
+   question_id
+   #(-> % (assoc :text text) (update :references move-references movements))))
 
 (defn assoc-reference [req question_id reference]
   (update-editor req question_id assoc-in [:references (:offset reference)] reference))

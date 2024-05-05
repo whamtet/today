@@ -53,12 +53,7 @@ document.onselectionchange = () => {
 const addReference = () => {
     const selection = getSelection();
     if (selection) {
-        // first save the text
-        const values = {
-            command: 'text',
-            text: $('#editor').innerText
-        };
-        htmx.ajax('POST', 'editor', {values});
+        saveEditor();
         // next open window
         const offset = getIndex(trailingNode(selection));
         const params = new URLSearchParams({offset, question_id});
@@ -69,6 +64,8 @@ const addReference = () => {
         window.open(viewerHref + '?' + params.toString());
     }
 }
+
+const openPage = page => window.open(viewerHref + '?page=' + page);
 
 // refresh for references
 window.onmessage = ({data}) => {
