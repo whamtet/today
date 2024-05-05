@@ -56,4 +56,4 @@
                      :migrate-on-init? true}
  :db.sql/connection #profile {:dev {:jdbc-url "jdbc:sqlite:today_dev.db?foreign_keys=true"},
                               :test {:jdbc-url "jdbc:sqlite:today_test.db?foreign_keys=true"},
-                              :prod {:jdbc-url "jdbc:sqlite:today_dev.db?foreign_keys=true"}}}
+                              :prod {:jdbc-url "jdbc:sqlite:today_prod.db?foreign_keys=true"}}}
