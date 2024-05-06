@@ -65,7 +65,9 @@
   (update-editor
    req
    question_id
-   #(-> % (assoc :text text) (update :references move-references movements))))
+   #(-> %
+     (assoc :text (.replace text " " " "))
+     (update :references move-references movements))))
 
 (defn assoc-reference [req question_id reference]
   (update-editor req question_id assoc-in [:references (:offset reference)] reference))

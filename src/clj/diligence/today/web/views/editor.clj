@@ -1,6 +1,7 @@
 (ns diligence.today.web.views.editor
     (:require
       [clojure.string :as string]
+      [clojure.walk :as walk]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [page-htmx defcomponent defcomponent-user]]
@@ -11,10 +12,9 @@
 
 (def default-text "Write your answer here...")
 (defn- render-reference [i {:keys [offset page]}]
-  (render/html ""
-               [:sup {:class "reference text-blue-400 cursor-pointer"
-                      :onclick (format "openPage(%s)" page)
-                      :data-offset offset} (inc i)]))
+  [:sup {:class "reference text-blue-400 cursor-pointer"
+         :onclick (format "openPage(%s)" page)
+         :data-offset offset} (inc i)])
 
 (defn- insert-references* [text references]
   (loop [i 0
@@ -27,7 +27,7 @@
             (let [offset (- (:offset reference) poffset)]
               (if (>= offset (.length text))
                 ;; drop remaining references
-                (conj done text (render-reference i reference))
+                (conj done text (render-reference i reference) " ")
                 (recur
                   (inc i)
                   (.substring text offset)
@@ -36,22 +36,21 @@
                   (conj done (.substring text 0 offset) (render-reference i reference))))))))
 
 (defn- insert-references [text references]
-  (-> (insert-references* text references) reverse string/join))
+  (reverse (insert-references* text references)))
 
-(defn- render-line [line]
-  [:div
-   (if (-> line .trim empty?)
-     "&nbsp"
-     line)])
 (defn- render-lines [s]
-  (map render-line (.split s "\n")))
+  (if (string? s)
+    (-> s
+        (.replace "\n" "<br>")
+        (.replace " " "&nbsp;"))
+    s))
 
 (defn- render-editor [{:keys [text references]}]
   (->> references
        vals
        (sort-by :offset)
        (insert-references text)
-       render-lines))
+       (map render-lines)))
 
 (defn- get-editor [req question_id]
   (if-let [state (question/get-editor req question_id)]
