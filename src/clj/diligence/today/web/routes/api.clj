@@ -69,18 +69,17 @@
        (-> req :body-params (update :offset #(Long/parseLong %))))
       ok)]
    ;; retrievals
-   ["/thumbnail/:file_id"
+   ["/thumbnail/:project_id/:file_id/:page"
     (fn [req]
       (-> req :session :user_id assert)
       {:status 200
        :headers {"Content-Type" "image/jpg"}
-       :body (-> req (assoc :query-fn query-fn) (file/get-thumbnail-stream (-> req :path-params :file_id)))})]
-   ["/pdf/:file_id"
-    (fn [req]
-      (-> req :session :user_id assert)
-      {:status 200
-       :headers {"Content-Type" "application/pdf"}
-       :body (-> req (assoc :query-fn query-fn) (file/get-file-stream (-> req :path-params :file_id)))})]
+       :body (-> req
+                 (assoc :query-fn query-fn)
+                 (file/get-thumbnail-stream
+                  (-> req :path-params :project_id)
+                  (-> req :path-params :file_id)
+                  (-> req :path-params :page Long/parseLong)))})]
    ["/health"
     {:get health/healthcheck!}]])
 

@@ -10,15 +10,4 @@
       [simpleui.core :as simpleui]
       [simpleui.render :as render]))
 
-(defcomponent ^:endpoint reference-modal [req text ^:json movements command]
-  (case command
-        "text"
-        (iam/when-authorized
-         (question/update-editor-text req (:question_id path-params) text movements)
-         nil)
-        [:div
-         [:script (format "question_id = %s" (:question_id path-params))]
-         (button "add-reference" "Add reference..." "addReference()")
-         [:div#editor.mt-2.p-2.border {:contenteditable "true"
-                                       :onblur "saveEditor()"}
-          (get-editor req (:question_id path-params))]]))
+(defcomponent ^:endpoint reference-modal [req text ^:json movements command])

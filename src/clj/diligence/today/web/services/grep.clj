@@ -6,9 +6,9 @@
   (let [[_ page-num content] (re-find #"./(\d+).txt:(.+)" s)]
     [(Long/parseLong page-num) (.trim content)]))
 
-(defn grep [filter filename]
+(defn grep [project_id filter filename]
   (when (-> filter count (>= 3))
-        (some-> (sh "grep" "-ir" filter "." :dir (str "files/grep/" (.replace filename ".pdf" "")))
+        (some-> (sh "grep" "-ir" filter "." :dir (format "files/%s/grep/%s" project_id (.replace filename ".pdf" "")))
                 :out
                 .trim
                 not-empty

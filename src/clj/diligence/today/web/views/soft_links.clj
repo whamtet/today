@@ -18,14 +18,14 @@
         (iam/when-authorized
          (let [{:keys [filename]} (soft-link/get-file req (:question_id path-params))]
            [:div#link-preview {:class "text-gray-600 p-2"}
-            (for [[page result] (grep/grep new-q filename)]
+            (for [[page result] (grep/grep project_id new-q filename)]
               [:a {:href (common/href-viewer (:question_id path-params) page)
                    :target "_blank"}
                [:div.text-gray-500 page ": " result]])]))
         "create"
         (iam/when-authorized
          (let [{:keys [filename]} (soft-link/get-file req (:question_id path-params))]
-           (when (not-empty (grep/grep new-q filename))
+           (when (not-empty (grep/grep project_id new-q filename))
                  (soft-link/insert-soft-link req (:question_id path-params) new-q)
                  response/hx-refresh)))
         [:div
@@ -52,7 +52,7 @@
           [:div
            [:h3.mb-3 "Soft Links"]
            (for [q (soft-link/get-soft-links req file_id)]
-             (let [results (grep/grep q filename)]
+             (let [results (grep/grep project_id q filename)]
                [:div [:h4.flex q [:span {:class "text-gray-500 ml-2 cursor-pointer"
                                          :hx-delete "soft-links:del"
                                          :hx-vals {:q q}}

@@ -1,5 +1,6 @@
 (ns diligence.today.util
   (:require
+    [clojure.string :as string]
     [diligence.today.env :refer [dev?]]))
 
 (defmacro defm [sym & rest]
@@ -16,3 +17,8 @@
 
 (defn key-by [f s]
   (zipmap (map f s) s))
+
+(defmacro format-js [s]
+  `(-> ~s
+    ~@(for [[to-replace replacement] (re-seq #"\{([^\}]+)}" s)]
+       `(string/replace-first ~to-replace ~(read-string replacement)))))
