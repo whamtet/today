@@ -4,7 +4,7 @@
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [page-htmx defcomponent defcomponent-user]]
       [diligence.today.web.views.common :as common]
-      [diligence.today.web.views.editor :as editor]
+      [diligence.today.web.views.answer.editor :as editor]
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 

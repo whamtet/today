@@ -1,4 +1,4 @@
-(ns diligence.today.web.views.editor
+(ns diligence.today.web.views.answer.editor
     (:require
       [clojure.string :as string]
       [clojure.walk :as walk]
@@ -16,27 +16,33 @@
          :onclick (format "openPage(%s)" page)
          :data-offset offset} (inc i)])
 
-(defn- insert-references* [text references]
-  (loop [i 0
-         text text
-         [reference & rest] references
-         poffset 0
-         done ()]
-    (if-not reference
-            (conj done text)
-            (let [offset (- (:offset reference) poffset)]
-              (if (>= offset (.length text))
-                ;; drop remaining references
-                (conj done text (render-reference i reference) " ")
-                (recur
-                  (inc i)
-                  (.substring text offset)
-                  rest
-                  (:offset reference)
-                  (conj done (.substring text 0 offset) (render-reference i reference))))))))
+(defn- insert-references*
+  [i
+   text
+   [reference & rest]
+   poffset
+   done]
+  (if-not reference
+          (conj done text)
+          (let [offset (- (:offset reference) poffset)]
+            (if (>= offset (.length text))
+              ;; drop remaining references
+              (conj done text (render-reference i reference) " ")
+              (recur
+                (inc i)
+                (.substring text offset)
+                rest
+                (:offset reference)
+                (conj done (.substring text 0 offset) (render-reference i reference)))))))
 
 (defn- insert-references [text references]
-  (reverse (insert-references* text references)))
+  (reverse
+   (insert-references*
+    0
+    text
+    references
+    0
+    ())))
 
 (defn- render-lines [s]
   (if (string? s)

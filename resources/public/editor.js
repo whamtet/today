@@ -1,11 +1,12 @@
 const $ = x => document.querySelector(x);
-const $$ = x => document.querySelectorAll(x);
+const $$ = x => Array.from(document.querySelectorAll(x));
 
 const isDev = location.host.startsWith('localhost');
 const viewerHref = isDev ? 'http://localhost:8888/web/index.html' : 'https://app.simplifydd.com/pdf.js/web/';
 
 const isText = el => el.nodeType === el.TEXT_NODE;
 const editorHas = x => $('#editor').contains(x);
+const referenceHas = x => $$('.reference').some(ref => ref.contains(x));
 // const isSubeditor = el => isText(el) ? el.parentNode.id === 'editor' : el.id === 'editor';
 
 const markerText = Math.random().toString();
@@ -46,7 +47,10 @@ document.onselectionchange = () => {
     const selection = getSelection();
     if (selection) {
         const {anchorNode, focusNode} = selection;
-        $('#add-reference').disabled = !editorHas(anchorNode) || !editorHas(focusNode);
+        $('#add-reference').disabled = (
+            !editorHas(anchorNode) || !editorHas(focusNode)
+            || referenceHas(anchorNode) || referenceHas(focusNode)
+        );
     }
 }
 

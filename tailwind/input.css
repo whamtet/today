@@ -41,3 +41,7 @@ h4 {
     border-bottom: 0.3em solid;
     border-left: 0.3em solid transparent;
 }
+
+.reference:hover .preview {
+    visibility: visible;
+}
