@@ -32,6 +32,7 @@
     [:link {:rel "icon" :href "/icon.png"}]
     [:link {:rel "stylesheet" :href (resource-cache/cache-suffix "/output.css")}]]
    [:body
+    [:div#modal]
     (render/walk-attrs body)
     [:script {:src
               (unminify "https://unpkg.com/htmx.org@1.9.5/dist/htmx.min.js")}]

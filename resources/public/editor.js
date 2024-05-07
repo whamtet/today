@@ -59,13 +59,12 @@ const addReference = () => {
     if (selection) {
         saveEditor();
         // next open window
-        const offset = getIndex(trailingNode(selection));
-        const params = new URLSearchParams({offset, question_id});
+        const values = {offset: getIndex(trailingNode(selection))};
         const q = selection.toString().trim();
         if (q) {
-            params.append('q', q);
+            values.q = q;
         }
-        window.open(viewerHref + '?' + params.toString());
+        htmx.ajax('POST', 'reference-modal', {values, target: '#modal'});
     }
 }
 
