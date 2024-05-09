@@ -27,7 +27,7 @@ const insertMarker = ([el, offset]) => {
 
 const getIndex = (offsets) => {
     const marker = insertMarker(offsets);
-    const index = $('#editor').innerText.indexOf(markerText);
+    const index = innerText($('#editor')).indexOf(markerText);
     marker.remove();
     return index;
 }

@@ -59,7 +59,7 @@ background-color: white;"}
         {:keys [question]} (question/get-question req question_id)]
     [:div
      (inset-disp question (fragment/get-fragments req question_id))
-     [:div#modal]]))
+     [:div#modal.hidden]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes-simple
