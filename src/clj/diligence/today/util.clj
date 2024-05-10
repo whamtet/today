@@ -22,3 +22,6 @@
   `(-> ~s
     ~@(for [[to-replace replacement] (re-seq #"\{([^\}]+)}" s)]
        `(string/replace-first ~to-replace ~(read-string replacement)))))
+
+(defn some-item [f s]
+  (some #(when (f %) %) s))

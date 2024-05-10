@@ -9,7 +9,6 @@
 
 (def files (File. "files"))
 
-#_#_#_#_
 (defn- num-pages [project_id filename]
   (->> (sh "pdftotext" "-f" "10000" (format-js "files/{project_id}/{filename}"))
       :err
@@ -44,8 +43,9 @@
     (.mkdirs (File. files project_id))
     (io/copy tempfile f)
     (thumbnail/thumbnails project_id filename)
-    #_(convert-pages project_id filename (num-pages project_id filename))
-    (query-fn :insert-file (mk project_id filename))))
+    (let [pages (num-pages project_id filename)]
+      (convert-pages project_id filename pages)
+      (query-fn :insert-file (mk project_id filename pages)))))
 
 (defn get-files [{:keys [query-fn]} project_id]
   (query-fn :get-files {:project_id project_id}))
@@ -53,7 +53,7 @@
 (defn get-file [{:keys [query-fn]} file_id]
   (query-fn :get-file {:file_id file_id}))
 
-(defn get-thumbnail-stream [req project_id file_id page]
-  (let [{:keys [filename]} (get-file req file_id)]
+(defn get-thumbnail-stream [req file_id page]
+  (let [{:keys [filename project_id]} (get-file req file_id)]
     (io/input-stream
      (thumbnail/thumbnail-file project_id filename page))))

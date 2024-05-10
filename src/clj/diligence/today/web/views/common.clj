@@ -1,5 +1,6 @@
 (ns diligence.today.web.views.common
     (:require
+      [clojure.string :as string]
       [diligence.today.env :refer [dev?]]
       [diligence.today.web.views.dropdown :as dropdown]))
 
@@ -19,8 +20,10 @@
     "http://localhost:8888/web/viewer.html"
     "https://app.simplifydd.com/pdf.js/web/viewer.html"))
 
-(defn href-viewer
-  ([project_id]
-   (format "%s?project_id=%s" viewer-location project_id))
-  ([project_id page]
-   (format "%s?project_id=%s&page=%s" viewer-location project_id page)))
+(defn- params [m]
+  (->> m
+       (map (fn [[k v]] (format "%s=%s" (name k) v)))
+       (string/join "&")))
+
+(defn href-viewer [m]
+  (format "%s?%s" viewer-location (params m)))

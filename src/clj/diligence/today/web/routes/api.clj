@@ -69,7 +69,7 @@
        (-> req :body-params (update :offset #(Long/parseLong %))))
       ok)]
    ;; retrievals
-   ["/thumbnail/:project_id/:file_id/:page"
+   ["/thumbnail/:file_id/:page"
     (fn [req]
       (-> req :session :user_id assert)
       {:status 200
@@ -77,7 +77,6 @@
        :body (-> req
                  (assoc :query-fn query-fn)
                  (file/get-thumbnail-stream
-                  (-> req :path-params :project_id)
                   (-> req :path-params :file_id)
                   (-> req :path-params :page Long/parseLong)))})]
    ["/health"

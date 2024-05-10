@@ -106,7 +106,7 @@
       [:a {:href (href-viewer project_id)
            :target "_blank"}
        [:img {:class "w-64"
-              :src (format "/api/thumbnail/%s/%s/0" project_id file_id)}]])]))
+              :src (format "/api/thumbnail/%s/0" file_id)}]])]))
 
 (defcomponent-user ^:endpoint question-maker [req file]
   project-edit
