@@ -6,7 +6,7 @@
       [diligence.today.web.controllers.project :as project]
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [page-htmx defcomponent defcomponent-user]]
-      [diligence.today.web.views.common :as common :refer [href-viewer]]
+      [diligence.today.web.views.common :as common]
       [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]
       [diligence.today.web.views.icons :as icons]
@@ -103,7 +103,7 @@
                       :hx-encoding "multipart/form-data"}]]
    [:div.flex.items-center
     (for [{:keys [file_id]} (file/get-files req project_id)]
-      [:a {:href (href-viewer project_id)
+      [:a {:href (common/href-viewer {:project_id project_id})
            :target "_blank"}
        [:img {:class "w-64"
               :src (format "/api/thumbnail/%s/0" file_id)}]])]))

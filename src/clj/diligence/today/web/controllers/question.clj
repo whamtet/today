@@ -43,7 +43,7 @@
           :editor
           read-string))
 
-(defn- set-editor [{:keys [query-fn]} question_id editor]
+(defn set-editor [{:keys [query-fn]} question_id editor]
   (query-fn :update-editor {:question_id question_id
                             :editor (pr-str editor)}))
 

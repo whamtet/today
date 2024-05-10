@@ -13,6 +13,7 @@
       [simpleui.response :as response]))
 
 (defcomponent ^:endpoint new-soft-link [req new-q command]
+  #_
   (case command
         "search"
         (iam/when-authorized
@@ -43,6 +44,7 @@
          [:div#link-preview]]))
 
 (defcomponent ^:endpoint soft-links [req command q]
+  #_
   (let [{:keys [file_id filename]} (soft-link/get-file req (:question_id path-params))]
     (case command
           "del"

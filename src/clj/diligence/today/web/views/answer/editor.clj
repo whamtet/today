@@ -1,21 +1,23 @@
 (ns diligence.today.web.views.answer.editor
     (:require
-      [clojure.string :as string]
-      [clojure.walk :as walk]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [page-htmx defcomponent defcomponent-user]]
+      [diligence.today.util :as util :refer [format-js]]
       [diligence.today.web.views.answer.reference-modal :as reference-modal]
-      [diligence.today.web.views.common :as common :refer [href-viewer]]
+      [diligence.today.web.views.common :as common]
       [diligence.today.web.views.components :as components]
       [simpleui.core :as simpleui]
       [simpleui.render :as render]))
 
 (def default-text "Write your answer here...")
-(defn- render-reference [i {:keys [offset page]}]
-  [:sup {:class "reference text-blue-400 cursor-pointer"
-         :onclick (format "openPage(%s)" page)
-         :data-offset offset} (inc i)])
+(defn- render-reference [i {:keys [offset page file_id]}]
+  [:sup {:class "reference text-blue-400 cursor-pointer relative"
+         ;; can't use link because contenteditable = "true"
+         :onclick (format-js "openPage({page})")
+         :data-offset offset} (inc i)
+   [:span {:class "absolute w-80 -top-20 invisible"}
+    [:img {:src (format-js "/api/thumbnail/{file_id}/{page}")}]]])
 
 (defn- insert-references*
   [i

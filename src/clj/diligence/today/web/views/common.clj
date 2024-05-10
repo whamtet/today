@@ -17,8 +17,8 @@
 
 (def viewer-location
   (if dev?
-    "http://localhost:8888/web/viewer.html"
-    "https://app.simplifydd.com/pdf.js/web/viewer.html"))
+    "http://localhost:8888/web/index.html"
+    "https://app.simplifydd.com/pdf.js/web/"))
 
 (defn- params [m]
   (->> m
