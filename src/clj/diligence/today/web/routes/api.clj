@@ -68,15 +68,6 @@
        (-> req :path-params :question_id Long/parseLong)
        (-> req :body-params (update :offset #(Long/parseLong %))))
       ok)]
-   ["/tt"
-    (fn [req]
-      (-> req
-          (assoc :query-fn query-fn)
-          (question/set-editor 1 {:text "Write your answer here..."
-                                  :references {5 {:offset 5 :file_id 1 :page 2}}}))
-      {:status 200
-       :headers {"Content-Type" "text/html"}
-       :body "ok"})]
    ;; retrievals
    ["/thumbnail/:file_id/:page"
     (fn [req]

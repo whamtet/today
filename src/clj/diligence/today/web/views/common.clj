@@ -22,6 +22,7 @@
 
 (defn- params [m]
   (->> m
+       (remove #(-> % second nil?))
        (map (fn [[k v]] (format "%s=%s" (name k) v)))
        (string/join "&")))
 

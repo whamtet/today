@@ -17,7 +17,7 @@
          :onclick (format-js "openPage({page})")
          :data-offset offset} (inc i)
    [:span {:class "absolute w-80 -top-20 invisible"}
-    [:img {:src (format-js "/api/thumbnail/{file_id}/{page}")}]]])
+    [:img {:src (format-js "/api/thumbnail/{file_id}/{(dec page)}")}]]])
 
 (defn- insert-references*
   [i
