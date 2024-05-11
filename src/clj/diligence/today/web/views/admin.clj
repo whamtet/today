@@ -1,5 +1,6 @@
-(ns diligence.today.web.views.question-maker
+(ns diligence.today.web.views.admin
     (:require
+      [clojure.string :as string]
       [diligence.today.util :as util]
       [diligence.today.web.controllers.file :as file]
       [diligence.today.web.controllers.iam :as iam]
@@ -94,7 +95,9 @@
 
 (defn file-selector [req project_id]
   (list
-   [:div.mb-2 (components/button-label "add-file" "Add file to project")
+   [:div.flex.items-center.mb-2
+    (components/button-label "add-file" "Add file to project")
+    [:div.ml-2 (components/qtip "To update a file use the same filename")]
     [:input#add-file {:class "hidden"
                       :type "file"
                       :name "file"
@@ -102,9 +105,11 @@
                       :hx-post "question-maker"
                       :hx-encoding "multipart/form-data"}]]
    [:div.flex.items-center
-    (for [{:keys [file_id]} (file/get-files req project_id)]
-      [:a {:href (common/href-viewer {:project_id project_id})
+    (for [{:keys [file_id filename]} (file/get-files req project_id)]
+      [:a {:class "mt-2"
+           :href (common/href-viewer {:project_id project_id})
            :target "_blank"}
+       [:div.text-center (string/replace filename #"\d+.pdf$" "pdf")]
        [:img {:class "w-64"
               :src (format "/api/thumbnail/%s/0" file_id)}]])]))
 
@@ -136,7 +141,8 @@
         [:div#duplicate-warning]
         (question-edit req nil nil)
         [:hr.my-4.border]
-        (file-selector req project_id)]])))
+        [:div.p-2
+         (file-selector req project_id)]]])))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes

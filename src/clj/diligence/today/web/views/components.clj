@@ -1,4 +1,6 @@
-(ns diligence.today.web.views.components)
+(ns diligence.today.web.views.components
+    (:require
+      [diligence.today.web.views.icons :as icons]))
 
 (defn warning [msg]
   [:span {:class "bg-red-600 p-2 rounded-lg text-white"} msg])
@@ -45,3 +47,7 @@
                   :margin-top "3vh"
                   :margin-bottom "3vh"}}
     contents]])
+
+(defn qtip [msg]
+  [:div.tooltip.relative.text-gray-600 icons/qmark
+   [:span.tooltiptext.invisible.absolute.w-48.border.p-2.rounded-md.bg-white msg]])

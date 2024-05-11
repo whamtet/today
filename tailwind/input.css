@@ -47,3 +47,7 @@ h4 {
     transition-delay: 0.3s;
     transition-property: visibility;
 }
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
