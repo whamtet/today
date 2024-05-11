@@ -3,6 +3,7 @@
       [clojure.java.io :as io]
       [clojure.java.shell :refer [sh]]
       [diligence.today.web.services.thumbnail :as thumbnail]
+      [diligence.today.web.services.wc :as wc]
       [diligence.today.util :refer [mk format-js]])
     (:import
       java.io.File))
@@ -21,16 +22,8 @@
           project_id
           (.replaceAll filename ".pdf$" "")
           i))
-(defn- wc-src [project_id filename]
-  (format "files/%s/grep/%s/*"
-          project_id
-          (.replaceAll filename ".pdf$" "")))
 (defn- text-file-all [project_id filename]
   (format "files/%s/grep/%s.txt"
-          project_id
-          (.replaceAll filename ".pdf$" "")))
-(defn- wc-file [project_id filename]
-  (format "files/%s/grep/%s.wc"
           project_id
           (.replaceAll filename ".pdf$" "")))
 
@@ -49,11 +42,6 @@
       (format "files/%s/%s" project_id filename)
       (text-file-all project_id filename)))
 
-(defn- wc [project_id filename]
-  (sh "bash"
-      "-c"
-      (format-js "wc {(wc-src project_id filename)} > {(wc-file project_id filename)}")))
-
 (defn- convert-pages [project_id filename limit]
   (->> (.replaceAll filename ".pdf$" "")
        (format "files/%s/grep/%s" project_id)
@@ -62,7 +50,7 @@
   (future
    (convert-all project_id filename)
    (->> limit inc (range 1) (map (convert-page project_id filename)) dorun)
-   (prn (wc project_id filename))))
+   (wc/wc! project_id filename)))
 
 (defn- index-filename [project_id filename i]
   (assert (.endsWith filename ".pdf"))
