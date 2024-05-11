@@ -7,8 +7,9 @@
     [(Long/parseLong page-num) (.trim content)]))
 
 (defn grep [project_id filter filename]
+  (assert false "unimplemented")
   (when (-> filter count (>= 3))
-        (some-> (sh "grep" "-ir" filter "." :dir (format "files/%s/grep/%s" project_id (.replace filename ".pdf" "")))
+        (some-> (sh "grep" "-ir" filter "." :dir (format "files/%s/grep/%s" project_id (.replaceAll filename ".pdf$" "")))
                 :out
                 .trim
                 not-empty

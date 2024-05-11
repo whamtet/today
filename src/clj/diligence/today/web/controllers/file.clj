@@ -19,8 +19,12 @@
 (defn- text-file [project_id filename i]
   (format "files/%s/grep/%s/%03d.txt"
           project_id
-          (.replace filename ".pdf" "")
+          (.replaceAll filename ".pdf$" "")
           i))
+(defn- text-file-all [project_id filename]
+  (format "files/%s/grep/%s.txt"
+          project_id
+          (.replaceAll filename ".pdf$" "")))
 
 (defn- convert-page [project_id filename]
   (fn [i]
@@ -31,17 +35,33 @@
         (format "files/%s/%s" project_id filename)
         (text-file project_id filename i))))
 
+(defn- convert-all [project_id filename]
+  (sh "pdftotext"
+      "-layout"
+      (format "files/%s/%s" project_id filename)
+      (text-file-all project_id filename)))
+
 (defn- convert-pages [project_id filename limit]
-  (->> (.replace filename ".pdf" "")
+  (->> (.replaceAll filename ".pdf$" "")
        (format "files/%s/grep/%s" project_id)
        File.
        .mkdirs)
+  (future (convert-all project_id filename))
   (->> limit inc (range 1) (map (convert-page project_id filename)) dorun future))
 
+(defn- index-filename [project_id filename i]
+  (assert (.endsWith filename ".pdf"))
+  (let [truncated (.replaceAll filename ".pdf$" "")
+        new-suffix (format ".%02d.pdf" i)
+        new-filename (str truncated new-suffix)]
+    (if (.exists (File. files (str project_id "/" new-filename)))
+      (recur project_id filename (inc i))
+      new-filename)))
+
 (defn copy-file [{:keys [query-fn]} project_id {:keys [tempfile filename]}]
-  (let [f (File. files (str project_id "/" filename))]
+  (let [filename (index-filename project_id filename 0)]
     (.mkdirs (File. files project_id))
-    (io/copy tempfile f)
+    (io/copy tempfile (File. files (str project_id "/" filename)))
     (thumbnail/thumbnails project_id filename)
     (let [pages (num-pages project_id filename)]
       (convert-pages project_id filename pages)

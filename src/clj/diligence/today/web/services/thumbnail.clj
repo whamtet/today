@@ -8,15 +8,15 @@
 (defn thumbnail-file [project_id filename i]
   (format "files/%s/thumbnails/%s/%03d.jpg"
           project_id
-          (.replace filename ".pdf" "")
+          (.replaceAll filename ".pdf$" "")
           i))
 (defn- thumbnail-all [project_id filename]
   (format "files/%s/thumbnails/%s/%%03d.jpg"
           project_id
-          (.replace filename ".pdf" "")))
+          (.replaceAll filename ".pdf$" "")))
 
 (defn thumbnails [project_id filename]
-  (->> (.replace filename ".pdf" "")
+  (->> (.replaceAll filename ".pdf$" "")
        (format "files/%s/thumbnails/%s" project_id)
        File.
        .mkdirs)
