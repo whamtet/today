@@ -25,9 +25,7 @@
    ""
    [query-fn]
    (fn [req]
-     (if (-> req :session :user_id)
-       (page-htmx
-        {:hyperscript? true
-         :js ["/editor.js" "/editor_value.js"]}
-        (-> req (assoc :query-fn query-fn) answer))
-       (response/redirect "/")))))
+     (page-htmx
+      {:hyperscript? true
+       :js ["/editor.js" "/editor_value.js"]}
+      (-> req (assoc :query-fn query-fn) answer)))))

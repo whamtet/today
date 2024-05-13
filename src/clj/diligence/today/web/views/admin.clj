@@ -104,6 +104,10 @@
       (map
        #(vector :option {:value %})
        (question/get-suggestions req project_id))]
+     [:datalist#suggestions-section
+      (map
+       #(vector :option {:value %})
+       (question/get-suggestions-section req project_id))]
      [:div {:class "w-3/4 border rounded-lg mx-auto"}
       [:table.w-full
        [:tbody
@@ -118,8 +122,6 @@
    ""
    [query-fn]
    (fn [req]
-     (if (-> req :session :user_id)
-       (page-htmx
-        {:hyperscript? true}
-        (-> req (assoc :query-fn query-fn) question-maker))
-       (response/redirect "/")))))
+     (page-htmx
+      {:hyperscript? true}
+      (-> req (assoc :query-fn query-fn) question-maker)))))

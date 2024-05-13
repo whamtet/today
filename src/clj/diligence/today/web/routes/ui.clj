@@ -13,27 +13,44 @@
    [reitit.ring.middleware.muuntaja :as muuntaja]
    [reitit.ring.middleware.parameters :as parameters]))
 
+(defn log-out-redirect [handler]
+  (fn [req]
+    (if (-> req :session :user_id)
+      (handler req)
+      {:status 302, :headers {"Location" "/"}, :body ""})))
+
 (defn route-data [opts]
   (merge
    opts
    {:muuntaja   formats/instance
     :middleware
-    [;; Default middleware for ui
-    ;; query-params & form-params
-      parameters/parameters-middleware
+    [
+     parameters/parameters-middleware
       ;; encoding response body
-      muuntaja/format-response-middleware
+     muuntaja/format-response-middleware
       ;; exception handling
-      exception/wrap-exception]}))
+     exception/wrap-exception]}))
+
+(defn route-data-redirect [opts]
+  (merge
+   opts
+   {:muuntaja   formats/instance
+    :middleware
+    [log-out-redirect
+     parameters/parameters-middleware
+     ;; encoding response body
+     muuntaja/format-response-middleware
+     ;; exception handling
+     exception/wrap-exception]}))
 
 (derive :reitit.routes/ui :reitit/routes)
 
 (defmethod ig/init-key :reitit.routes/ui
   [_ opts]
   [["" (route-data opts) (home/ui-routes opts)]
-   ["/project/:project_id" (route-data opts) (question-viewer/ui-routes opts)]
-   ["/project/:project_id/admin" (route-data opts) (admin/ui-routes opts)]
-   ["/project/:project_id/admin-file" (route-data opts) (admin-file/ui-routes opts)]
-   ["/project/:project_id/migrate/:new-file" (route-data opts) (migrate/ui-routes opts)]
-   ["/project/:project_id/question/:question_id" (route-data opts) (answer/ui-routes opts)]
+   ["/project/:project_id" (route-data-redirect opts) (question-viewer/ui-routes opts)]
+   ["/project/:project_id/admin" (route-data-redirect opts) (admin/ui-routes opts)]
+   ["/project/:project_id/admin-file" (route-data-redirect opts) (admin-file/ui-routes opts)]
+   ["/project/:project_id/migrate/:new-file" (route-data-redirect opts) (migrate/ui-routes opts)]
+   ["/project/:project_id/question/:question_id" (route-data-redirect opts) (answer/ui-routes opts)]
    ["/pdf-viewer" (route-data opts) (pdf-viewer/ui-routes opts)]])

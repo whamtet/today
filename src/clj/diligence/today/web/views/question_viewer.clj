@@ -34,8 +34,6 @@
    ""
    [query-fn]
    (fn [req]
-     (if (-> req :session :user_id)
-       (page-htmx
-        {:hyperscript? true}
-        (-> req (assoc :query-fn query-fn) question-viewer))
-       (response/redirect "/")))))
+     (page-htmx
+      {:hyperscript? true}
+      (-> req (assoc :query-fn query-fn) question-viewer)))))

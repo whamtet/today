@@ -67,9 +67,7 @@
    ""
    [query-fn]
    (fn [req]
-     (if (-> req :session :user_id)
-       (page-htmx
-        {:hyperscript? true
-         :js ["/file.js"]}
-        (-> req (assoc :query-fn query-fn) question-maker))
-       (response/redirect "/")))))
+     (page-htmx
+      {:hyperscript? true
+       :js ["/file.js"]}
+      (-> req (assoc :query-fn query-fn) question-maker)))))
