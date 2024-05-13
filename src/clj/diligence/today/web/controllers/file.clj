@@ -56,30 +56,37 @@
 (defn- index-filename [project_id filename i]
   (assert (.endsWith filename ".pdf"))
   (let [truncated (.replaceAll filename ".pdf$" "")
-        new-suffix (format ".%02d.pdf" i)
-        new-filename (str truncated new-suffix)]
+        new-filename (->> i (format ".%02d.pdf") (str truncated))]
     (if (.exists (File. files (str project_id "/" new-filename)))
       (recur project_id filename (inc i))
       [new-filename i])))
 
 (def suffix-match #"(\d+).pdf$")
 (defn dec-filename-index [filename]
-  (let [[_ index] (re-find suffix-match filename)
-        new-suffix (->> index Long/parseLong dec (format "%02d.pdf"))]
-    (string/replace filename suffix-match new-suffix)))
+  (->> filename
+       (re-find suffix-match)
+       second
+       Long/parseLong
+       dec
+       (format "%02d.pdf")
+       (string/replace filename suffix-match)))
 
-(defn- copy-file* [{:keys [query-fn]} project_id tempfile filename]
-  (let [[filename index] (index-filename project_id filename 0)]
+(defn copy-file [{:keys [query-fn]} project_id {:keys [tempfile filename]} old-filename]
+  (let [[filename index] (index-filename project_id (or old-filename filename) 0)]
     (.mkdirs (File. files project_id))
     (io/copy tempfile (File. files (str project_id "/" filename)))
     (thumbnail/thumbnails project_id filename)
     (let [pages (num-pages project_id filename)]
       (convert-pages project_id filename pages)
-      (query-fn :insert-file (mk project_id filename pages))
-      (when (pos? index) filename))))
-
-(defn copy-file [req project_id file old-filename]
-  (copy-file* req project_id (:tempfile file) (or old-filename (:filename file))))
+      (if (pos? index)
+        (do
+          (query-fn :update-file {:filename filename
+                                  :pages pages
+                                  :old-filename (dec-filename-index filename)})
+          filename)
+        (do
+          (query-fn :insert-file (mk project_id filename pages))
+          nil)))))
 
 (defn get-files [{:keys [query-fn]} project_id]
   (query-fn :get-files {:project_id project_id}))

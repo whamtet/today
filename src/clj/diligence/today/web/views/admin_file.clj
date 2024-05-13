@@ -1,6 +1,7 @@
 (ns diligence.today.web.views.admin-file
     (:require
       [clojure.string :as string]
+      [diligence.today.util :as util :refer [format-js]]
       [diligence.today.web.controllers.file :as file]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.project :as project]
@@ -13,26 +14,36 @@
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 
+(def file-accept "application/pdf")
 (defn file-selector [req project_id]
   (list
    [:div.flex.items-center
-    (components/button-label "add-file" "Add completely new file to project")
+    (components/button-label "add-file" "Add file to project")
     [:input#add-file {:class "hidden"
                       :type "file"
                       :name "file"
-                      :accept "application/pdf"
+                      :accept file-accept
                       :hx-post "question-maker"
                       :hx-encoding "multipart/form-data"}]]
    [:hr.border.my-2]
    [:p.my-2.text-gray-700 "Click on a file to update it"]
    [:div.flex.items-center
     (for [{:keys [file_id filename]} (file/get-files req project_id)]
-      [:a {:class "mt-2"
-           :href (common/href-viewer {:project_id project_id})
-           :target "_blank"}
-       [:div.text-center (string/replace filename #"\d+.pdf$" "pdf")]
-       [:img {:class "w-64"
-              :src (format "/api/thumbnail/%s/0" file_id)}]])]))
+      (let [filename-disp (string/replace filename #"\d+.pdf" "pdf")]
+        (list
+         [:input {:class "hidden"
+                  :id (format-js "f{file_id}")
+                  :type "file"
+                  :name "file"
+                  :accept file-accept
+                  :hx-post "question-maker"
+                  :hx-encoding "multipart/form-data"
+                  :hx-vals {:old-filename filename-disp}}]
+         [:div {:class "mt-2 cursor-pointer"
+                :onclick (format-js "updateFile('{filename-disp}', 'f{file_id}')")}
+          [:div.text-center filename-disp]
+          [:img {:class "w-64"
+                 :src (format "/api/thumbnail/%s/0" file_id)}]])))]))
 
 (defcomponent-user ^:endpoint question-maker [req file old-filename]
   (if (simpleui/post? req)
@@ -60,6 +71,7 @@
    (fn [req]
      (if (-> req :session :user_id)
        (page-htmx
-        {:hyperscript? true}
+        {:hyperscript? true
+         :js ["/file.js"]}
         (-> req (assoc :query-fn query-fn) question-maker))
        (response/redirect "/")))))

@@ -23,7 +23,7 @@
 (defn button-label [for label]
   [:label {:type "button"
            :for for
-           :class "bg-clj-blue py-1.5 px-3 rounded-lg text-white"}
+           :class "bg-clj-blue py-1.5 px-3 rounded-lg text-white cursor-pointer"}
    label])
 
 (defn modal [width & contents]
