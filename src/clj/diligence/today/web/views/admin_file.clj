@@ -5,7 +5,6 @@
       [diligence.today.web.controllers.file :as file]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.project :as project]
-      [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [page-htmx defcomponent-user]]
       [diligence.today.web.views.common :as common]
       [diligence.today.web.views.components :as components]
@@ -49,8 +48,7 @@
      (if-let [migration-file (file/copy-file req project_id file old-filename)]
        (response/hx-redirect (format "../migrate/%s/" migration-file))
        response/hx-refresh))
-    (let [questions (question/get-questions req project_id)
-          {project-name :name} (project/get-project-by-id req project_id)]
+    (let [{project-name :name} (project/get-project-by-id req project_id)]
       [:div {:_ "on click add .hidden to .drop"}
        ;; header row
        [:div {:class "flex justify-center"}

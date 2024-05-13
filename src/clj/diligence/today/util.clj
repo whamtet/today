@@ -25,3 +25,9 @@
 
 (defn some-item [f s]
   (some #(when (f %) %) s))
+
+(defn map-vals [f m]
+  (->> m vals (map f) (zipmap (keys m))))
+
+(defn group-by-map [f1 f2 s]
+  (->> s (filter f1) (group-by f1) (map-vals f2)))

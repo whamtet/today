@@ -33,9 +33,20 @@ select name from project where project_id = :project_id;
 
 -- :name get-question :query :one
 select * from question where question_id = :question_id;
-
 -- :name get-questions :query
-select * from question where project_id = :project_id;
+select section.*, question from section
+left outer join question on section.section_id = question.section_id
+where section.project_id = :project_id;
+
+-- :name get-sections :query
+select * from section where project_id = :project_id;
+
+-- :name insert-section :execute
+insert into section(project_id, section, ordering)
+select :project_id, :section, count(*) from section where project_id = :project_id;
+
+-- :name update-section :execute
+update section set section = :section where section_id = :section_id;
 
 -- :name get-question-text :query :one
 select * from question where project_id = :project_id and question = :question;

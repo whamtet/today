@@ -80,6 +80,61 @@
                :hx-vals {:question_id question_id}}
         icons/trash]]]]))
 
+(defn command-pair [command]
+  [(symbol (str command "?"))
+   `(= ~'command ~(str command))])
+(defmacro with-commands [commands & body]
+  `(let [~@(mapcat command-pair commands)]
+    ~@body))
+
+(defcomponent ^:endpoint section-editor [req ^:long section_id section command]
+  (with-commands [edit update]
+                 (when update? (question/update-section req section_id section))
+                 (if edit?
+                   [:form {:class "flex items-center justify-between w-full"
+                           :hx-post "section-editor:update"
+                           :hx-vals {:section_id section_id}}
+                    [:input {:class "w-full p-1 border mr-2 text-xl"
+                             :name "section"
+                             :value section
+                             :required true}]
+                    (components/submit "Save")]
+                   [:div {:class "flex items-center justify-between w-full"
+                          :hx-target "this"}
+                    [:div.text-xl section]
+                    [:div.flex
+                     [:div {:class "mr-2"
+                            :hx-get "section-editor:edit"
+                            :hx-vals {:section_id section_id
+                                      :section section}}
+                      (components/button "Edit")]
+                     [:div {:class ""
+                            :hx-post "admin:new-question"
+                            :hx-prompt "New question name"
+                            :hx-vals {:section_id section_id}}
+                      (components/button "New Question")]]])))
+
+(defcomponent ^:endpoint section-section [req
+                                          [base-section questions]
+                                          section_id]
+  (if (simpleui/delete? req)
+    (iam/when-authorized
+     (question/delete-section req section_id)
+     response/hx-refresh)
+    [:div
+     [:div {:class "text-gray-800 p-2 flex items-center justify-between"}
+      (section-editor req (:section_id base-section) (:section base-section) nil)
+      (when (empty? questions)
+            [:div {:class "ml-2 cursor-pointer"
+                   :hx-delete "section-section"
+                   :hx-vals {:section_id (:section_id base-section)}
+                   :hx-confirm "Remove section?"}
+             icons/trash])]
+     [:table.w-full
+      [:tbody
+       (for [{:keys [question_id question]} questions]
+         (question-ro req question_id question))]]]))
+
 (defn project-ro [project-name]
   [:form {:class "flex items-center"
           :hx-get "project-edit"}
@@ -89,33 +144,41 @@
             :type "submit"
             :value "Edit"}]])
 
-(defcomponent-user question-maker [req file]
+(defcomponent-user ^:endpoint admin [req ^:long section_id command]
   project-edit
-  (let [questions (question/get-questions req project_id)
-        {project-name :name} (project/get-project-by-id req project_id)]
-    [:div {:_ "on click add .hidden to .drop"}
-     ;; header row
-     [:div {:class "flex justify-center"}
-      [:a.absolute.left-1.top-1 {:href "/"}
-       [:img.w-16.m-2 {:src "/icon.png"}]]
-      (project-ro project-name)
-      (common/main-dropdown first_name project_id)]
-     [:datalist#suggestions
-      (map
-       #(vector :option {:value %})
-       (question/get-suggestions req project_id))]
-     [:datalist#suggestions-section
-      (map
-       #(vector :option {:value %})
-       (question/get-suggestions-section req project_id))]
-     [:div {:class "w-3/4 border rounded-lg mx-auto"}
-      [:table.w-full
-       [:tbody
-        (for [{:keys [question_id question]} questions]
-          (question-ro req question_id question))]]
-      [:hr.my-4.border]
-      [:div#duplicate-warning]
-      (question-edit req nil nil)]]))
+  (case command
+        "new-section"
+        (iam/when-authorized
+         (question/insert-section req project_id (get-in req [:headers "hx-prompt"]))
+         response/hx-refresh)
+        "new-question"
+        (iam/when-authorized
+         (question/add-question req project_id section_id (get-in req [:headers "hx-prompt"]))
+         response/hx-refresh)
+        (let [questions (question/get-questions req project_id)
+              {project-name :name} (project/get-project-by-id req project_id)]
+          [:div {:_ "on click add .hidden to .drop"}
+           ;; header row
+           [:div {:class "flex justify-center"}
+            [:a.absolute.left-1.top-1 {:href "/"}
+             [:img.w-16.m-2 {:src "/icon.png"}]]
+            (project-ro project-name)
+            (common/main-dropdown first_name project_id)]
+           [:datalist#suggestions
+            (map
+             #(vector :option {:value %})
+             (question/get-suggestions req project_id))]
+           [:datalist#suggestions-section
+            (map
+             #(vector :option {:value %})
+             (question/get-suggestions-section req project_id))]
+           [:div {:class "w-3/4 border rounded-md mx-auto p-1"}
+            [:div#duplicate-warning]
+            (map #(section-section req % nil) questions)
+            [:hr.my-4.border]
+            [:div {:hx-post "admin:new-section"
+                   :hx-prompt "New section name"}
+             (components/button "Add Section")]]])))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
@@ -124,4 +187,4 @@
    (fn [req]
      (page-htmx
       {:hyperscript? true}
-      (-> req (assoc :query-fn query-fn) question-maker)))))
+      (-> req (assoc :query-fn query-fn) admin)))))

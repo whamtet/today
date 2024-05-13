@@ -15,6 +15,11 @@
       hiddens
       (conj 'list)))
 
+(defn submit [value]
+  [:input {:type "submit"
+           :class "bg-clj-blue py-1.5 px-3 rounded-lg text-white"
+           :value value}])
+
 (defn button [label]
   [:button {:type "button"
             :class "bg-clj-blue py-1.5 px-3 rounded-lg text-white"}

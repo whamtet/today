@@ -16,11 +16,28 @@
             (when-not (or (empty? line) (.startsWith line "#"))
                       line)))))))
 
+(def suggestions-section
+  (-> "suggestions.txt"
+      io/resource
+      slurp
+      .trim
+      (.split "\n")
+      (->>
+       (keep
+        (fn [line]
+          (let [line (.trim line)]
+            (when (.startsWith line "#")
+                  (.substring line 2))))))))
+
 (defn get-question [{:keys [query-fn]} question_id]
   (query-fn :get-question {:question_id question_id}))
 
 (defn get-questions [{:keys [query-fn]} project_id]
-  (query-fn :get-questions {:project_id project_id}))
+  (util/group-by-map #(select-keys % [:section :section_id])
+                     #(filter :question %)
+                     (query-fn :get-questions {:project_id project_id})))
+(defn get-sections [{:keys [query-fn]} project_id]
+  (query-fn :get-sections {:project_id project_id}))
 
 (defn get-question-text [{:keys [query-fn]} project_id question]
   (query-fn :get-question-text
@@ -29,9 +46,12 @@
 
 (defn delete-question [{:keys [query-fn]} question_id]
   (query-fn :delete-question {:question_id question_id}))
+(defn delete-section [{:keys [query-fn]} section_id]
+  (query-fn :delete-section {:section_id section_id}))
 
-(defn add-question [{:keys [query-fn]} project_id question]
-  (query-fn :insert-question {:project_id project_id
+(defn add-question [{:keys [query-fn]} project_id section_id question]
+  (query-fn :insert-question {:section_id section_id
+                              :project_id project_id
                               :question question}))
 
 (defn update-question [{:keys [query-fn]} question_id question]
@@ -42,6 +62,18 @@
   (remove
    (->> (get-questions req project_id) (map :question) set)
    suggestions))
+
+(defn get-suggestions-section [req project_id]
+  (remove
+   (->> (get-sections req project_id) (map :section) set)
+   suggestions-section))
+
+(defn insert-section [{:keys [query-fn]} project_id section]
+  (query-fn :insert-section {:project_id project_id
+                             :section section}))
+
+(defn update-section [{:keys [query-fn]} section_id section]
+  (query-fn :update-section {:section_id section_id :section section}))
 
 (defn get-editor [req question_id]
   (some-> (get-question req question_id)

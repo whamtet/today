@@ -3,6 +3,7 @@ create table section
     section_id    integer primary key asc,
     project_id    integer,
     section       text,
+    ordering      integer,
     foreign key(project_id) references project(project_id)
 );
 --;;
