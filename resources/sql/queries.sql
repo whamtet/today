@@ -37,6 +37,9 @@ select * from question where question_id = :question_id;
 -- :name get-questions :query
 select * from question where project_id = :project_id;
 
+-- :name get-question-text :query :one
+select * from question where project_id = :project_id and question = :question;
+
 -- :name insert-question :execute
 insert into question (project_id, question) values (:project_id, :question);
 

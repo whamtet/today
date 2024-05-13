@@ -22,6 +22,11 @@
 (defn get-questions [{:keys [query-fn]} project_id]
   (query-fn :get-questions {:project_id project_id}))
 
+(defn get-question-text [{:keys [query-fn]} project_id question]
+  (query-fn :get-question-text
+            {:project_id project_id
+             :question question}))
+
 (defn delete-question [{:keys [query-fn]} question_id]
   (query-fn :delete-question {:question_id question_id}))
 

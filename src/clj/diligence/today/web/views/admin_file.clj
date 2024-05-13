@@ -6,11 +6,9 @@
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.project :as project]
       [diligence.today.web.controllers.question :as question]
-      [diligence.today.web.htmx :refer [page-htmx defcomponent defcomponent-user]]
+      [diligence.today.web.htmx :refer [page-htmx defcomponent-user]]
       [diligence.today.web.views.common :as common]
       [diligence.today.web.views.components :as components]
-      [diligence.today.web.views.dropdown :as dropdown]
-      [diligence.today.web.views.icons :as icons]
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 

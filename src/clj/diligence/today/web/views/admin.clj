@@ -16,19 +16,15 @@
 
 (defcomponent ^:endpoint question-edit [req ^:long-option question_id question]
   (if (simpleui/post? req)
-    (when-let [question (some-> question .trim not-empty)]
-      (if question_id
-        (iam/when-authorized
-         (question/update-question req question_id question)
-         response/hx-refresh)
-        (iam/when-authorized
-         (try
-           (question/add-question req project_id question)
-           response/hx-refresh
-           (catch clojure.lang.ExceptionInfo e
-             (if (util/uniqueness-violation? e)
-               [:div#duplicate-warning.my-2 (components/warning "Name taken")]
-               (throw e)))))))
+    (iam/when-authorized
+     (when-let [question (some-> question .trim not-empty)]
+       (if (question/get-question-text req project_id question)
+         [:div#duplicate-warning.my-2 (components/warning "Name taken")]
+         (do
+           (if question_id
+             (question/update-question req question_id question)
+             (question/add-question req project_id question))
+           response/hx-refresh))))
     [:tr
      [:td
       [:input {:class "w-full p-2 form-select"
@@ -93,56 +89,29 @@
             :type "submit"
             :value "Edit"}]])
 
-(defn file-selector [req project_id]
-  (list
-   [:div.flex.items-center.mb-2
-    (components/button-label "add-file" "Add file to project")
-    [:div.ml-2 (components/qtip "To update a file use the same filename")]
-    [:input#add-file {:class "hidden"
-                      :type "file"
-                      :name "file"
-                      :accept "application/pdf"
-                      :hx-post "question-maker"
-                      :hx-encoding "multipart/form-data"}]]
-   [:div.flex.items-center
-    (for [{:keys [file_id filename]} (file/get-files req project_id)]
-      [:a {:class "mt-2"
-           :href (common/href-viewer {:project_id project_id})
-           :target "_blank"}
-       [:div.text-center (string/replace filename #"\d+.pdf$" "pdf")]
-       [:img {:class "w-64"
-              :src (format "/api/thumbnail/%s/0" file_id)}]])]))
-
-(defcomponent-user ^:endpoint question-maker [req file]
+(defcomponent-user question-maker [req file]
   project-edit
-  (if (simpleui/post? req)
-    (iam/when-authorized
-     (file/copy-file req project_id file)
-     response/hx-refresh)
-    (let [questions (question/get-questions req project_id)
-          {project-name :name} (project/get-project-by-id req project_id)]
-      [:div {:_ "on click add .hidden to .drop"}
-       ;; header row
-       [:div {:class "flex justify-center"}
-        [:a.absolute.left-1.top-1 {:href "/"}
-         [:img.w-16.m-2 {:src "/icon.png"}]]
-        (project-ro project-name)
-        (common/main-dropdown first_name project_id)]
-       [:datalist#suggestions
-        (map
-         #(vector :option {:value %})
-         (question/get-suggestions req project_id))]
-       [:div {:class "w-3/4 border rounded-lg mx-auto"}
-        [:table.w-full
-         [:tbody
-          (for [{:keys [question_id question]} questions]
-            (question-ro req question_id question))]]
-        [:hr.my-4.border]
-        [:div#duplicate-warning]
-        (question-edit req nil nil)
-        [:hr.my-4.border]
-        [:div.p-2
-         (file-selector req project_id)]]])))
+  (let [questions (question/get-questions req project_id)
+        {project-name :name} (project/get-project-by-id req project_id)]
+    [:div {:_ "on click add .hidden to .drop"}
+     ;; header row
+     [:div {:class "flex justify-center"}
+      [:a.absolute.left-1.top-1 {:href "/"}
+       [:img.w-16.m-2 {:src "/icon.png"}]]
+      (project-ro project-name)
+      (common/main-dropdown first_name project_id)]
+     [:datalist#suggestions
+      (map
+       #(vector :option {:value %})
+       (question/get-suggestions req project_id))]
+     [:div {:class "w-3/4 border rounded-lg mx-auto"}
+      [:table.w-full
+       [:tbody
+        (for [{:keys [question_id question]} questions]
+          (question-ro req question_id question))]]
+      [:hr.my-4.border]
+      [:div#duplicate-warning]
+      (question-edit req nil nil)]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
