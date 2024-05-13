@@ -1,5 +1,6 @@
 (ns diligence.today.web.controllers.file
     (:require
+      [clojure.string :as string]
       [clojure.java.io :as io]
       [clojure.java.shell :refer [sh]]
       [diligence.today.web.services.thumbnail :as thumbnail]
@@ -59,16 +60,26 @@
         new-filename (str truncated new-suffix)]
     (if (.exists (File. files (str project_id "/" new-filename)))
       (recur project_id filename (inc i))
-      new-filename)))
+      [new-filename i])))
 
-(defn copy-file [{:keys [query-fn]} project_id {:keys [tempfile filename]}]
-  (let [filename (index-filename project_id filename 0)]
+(def suffix-match #"(\d+).pdf$")
+(defn dec-filename-index [filename]
+  (let [[_ index] (re-find suffix-match filename)
+        new-suffix (->> index Long/parseLong dec (format "%02d.pdf"))]
+    (string/replace filename suffix-match new-suffix)))
+
+(defn- copy-file* [{:keys [query-fn]} project_id tempfile filename]
+  (let [[filename index] (index-filename project_id filename 0)]
     (.mkdirs (File. files project_id))
     (io/copy tempfile (File. files (str project_id "/" filename)))
     (thumbnail/thumbnails project_id filename)
     (let [pages (num-pages project_id filename)]
       (convert-pages project_id filename pages)
-      (query-fn :insert-file (mk project_id filename pages)))))
+      (query-fn :insert-file (mk project_id filename pages))
+      (when (pos? index) filename))))
+
+(defn copy-file [req project_id file old-filename]
+  (copy-file* req project_id (:tempfile file) (or old-filename (:filename file))))
 
 (defn get-files [{:keys [query-fn]} project_id]
   (query-fn :get-files {:project_id project_id}))

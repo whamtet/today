@@ -23,5 +23,3 @@
        (re-seq #"(^|\n)\s+(\d+)")
        butlast
        (map #(-> % last Long/parseLong))))
-
-(prn (wc 1 "a.00.pdf"))
