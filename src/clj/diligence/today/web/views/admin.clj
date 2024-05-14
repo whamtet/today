@@ -11,39 +11,9 @@
       [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]
       [diligence.today.web.views.icons :as icons]
-      [simpleui.core :as simpleui]
-      [simpleui.response :as response]))
-
-(defcomponent ^:endpoint question-edit [req ^:long-option question_id question]
-  (if (simpleui/post? req)
-    (iam/when-authorized
-     (when-let [question (some-> question .trim not-empty)]
-       (if (question/get-question-text req project_id question)
-         [:div#duplicate-warning.my-2 (components/warning "Name taken")]
-         (do
-           (if question_id
-             (question/update-question req question_id question)
-             (question/add-question req project_id question))
-           response/hx-refresh))))
-    [:tr
-     [:td
-      [:input {:class "w-full p-2 form-select"
-               :id (str "qe" question_id)
-               :name "question"
-               :value question
-               :hx-post "question-edit"
-               :placeholder "New question..."
-               :hx-vals {:question_id question_id}
-               :hx-target "#duplicate-warning"
-               :list "suggestions"}]]
-     (when question_id
-           [:td
-            [:span {:class "ml-2"
-                    :hx-post "question-edit"
-                    :hx-vals {:question_id question_id}
-                    :hx-target "#duplicate-warning"
-                    :hx-include (str "#qe" question_id)}
-             (components/button "Update")]])]))
+      [simpleui.core :as simpleui :refer [with-commands]]
+      [simpleui.response :as response]
+      [simpleui.rt :as rt]))
 
 (defcomponent ^:endpoint project-edit [req project-name]
   (if (simpleui/post? req)
@@ -51,41 +21,61 @@
       (iam/when-authorized
        (project/update-project req project_id project-name)
        response/hx-refresh))
-    [:form {:hx-post "project-edit"}
-     [:input {:class "p-2"
+    [:form {:class "flex items-center"
+            :hx-post "project-edit"}
+     [:input {:class "p-2 text-4xl my-6 mr-4"
               :name "project-name"
               :value project-name
               :hx-post "project-edit"
               :placeholder "Project name..."}]
-     [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24"
+     [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24 cursor-pointer"
               :type "submit"
               :value "Save"}]]))
 
-(defcomponent ^:endpoint question-ro [req question_id question]
-  (if (simpleui/delete? req)
-    (iam/when-authorized
-     (question/delete-question req question_id)
-     response/hx-refresh)
-    [:tr {:hx-target "this"}
-     [:td.p-2 question]
-     [:td.p-2
-      [:div.flex.items-center
-       [:span {:class "mr-2"
-               :hx-get "question-edit"
-               :hx-vals {:question_id question_id :question question}}
-        (components/button "Edit Question")]
-       [:span {:class "opacity-50 cursor-pointer"
-               :hx-delete "question-ro"
-               :hx-confirm "Delete question? Cannot be undone."
-               :hx-vals {:question_id question_id}}
-        icons/trash]]]]))
+(defn project-ro [project-name]
+  [:form {:class "flex items-center"
+          :hx-get "project-edit"}
+   (components/hiddensm project-name)
+   [:div.my-6.mr-4.text-gray-500.text-4xl project-name]
+   [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24 cursor-pointer"
+            :type "submit"
+            :value "Edit"}]])
 
-(defn command-pair [command]
-  [(symbol (str command "?"))
-   `(= ~'command ~(str command))])
-(defmacro with-commands [commands & body]
-  `(let [~@(mapcat command-pair commands)]
-    ~@body))
+(defcomponent ^:endpoint question-editor [req
+                                          ^:long question_id
+                                          question
+                                          command]
+  (with-commands req
+                 (when update? (question/update-question req question_id question))
+                 (cond
+                  delete?
+                  (iam/when-authorized
+                   (question/delete-question req question_id)
+                   response/hx-refresh)
+                  edit?
+                  [:form {:class "p-2 flex items-center justify-between"
+                          :hx-post "question-editor:update"
+                          :hx-vals {:question_id question_id}}
+                   [:input {:class "w-full p-1 border mr-2"
+                            :name "question"
+                            :value question
+                            :required true}]
+                   (components/submit "Save")]
+                  :else
+                  [:div {:class "p-2 flex items-center justify-between"
+                         :hx-target "this"}
+                   [:div question]
+                   [:div.flex.items-center
+                    [:div {:class "mr-2"
+                           :hx-get "question-editor:edit"
+                           :hx-vals {:question_id question_id
+                                     :question question}}
+                     (components/button "Edit")]
+                    [:span {:class "opacity-50 cursor-pointer"
+                            :hx-delete "question-editor:delete"
+                            :hx-confirm "Delete question? This will wipe the answer as well."
+                            :hx-vals {:question_id question_id}}
+                     icons/trash]]])))
 
 (defcomponent ^:endpoint section-editor [req
                                          ^:boolean last
@@ -93,7 +83,8 @@
                                          ^:long section_id
                                          section
                                          command]
-  (with-commands [edit update]
+  (with-commands req
+                 section-editor
                  (when update? (question/update-section req section_id section))
                  (if edit?
                    [:form {:class "flex items-center justify-between w-full"
@@ -141,7 +132,7 @@
     (iam/when-authorized
      (question/delete-section req section_id)
      response/hx-refresh)
-    [:div
+    [:div.pb-12
      [:div {:class "text-gray-800 p-2 flex items-center justify-between"}
       (section-editor req
                       last?
@@ -155,19 +146,8 @@
                    :hx-vals {:section_id (:section_id base-section)}
                    :hx-confirm "Remove section?"}
              icons/trash])]
-     [:table.w-full
-      [:tbody
-       (for [{:keys [question_id question]} questions]
-         (question-ro req question_id question))]]]))
-
-(defn project-ro [project-name]
-  [:form {:class "flex items-center"
-          :hx-get "project-edit"}
-   (components/hiddensm project-name)
-   [:div.my-6.mr-4.text-gray-500.text-4xl project-name]
-   [:input {:class "bg-clj-blue p-1.5 rounded-lg text-white w-24 cursor-pointer"
-            :type "submit"
-            :value "Edit"}]])
+     [:hr.border.my-2]
+     (rt/map-indexed question-editor req questions)]))
 
 (defcomponent-user ^:endpoint admin [req ^:long section_id ^:long mid command]
   project-edit

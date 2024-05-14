@@ -13,34 +13,36 @@
 
 (def file-accept "application/pdf")
 (defn file-selector [req project_id]
-  (list
-   [:div.flex.items-center
-    (components/button-label "add-file" "Add file to project")
-    [:input#add-file {:class "hidden"
-                      :type "file"
-                      :name "file"
-                      :accept file-accept
-                      :hx-post "question-maker"
-                      :hx-encoding "multipart/form-data"}]]
-   [:hr.border.my-2]
-   [:p.my-2.text-gray-700 "Click on a file to update it"]
-   [:div.flex.items-center
-    (for [{:keys [file_id filename]} (file/get-files req project_id)]
-      (let [filename-disp (string/replace filename #"\d+.pdf" "pdf")]
-        (list
-         [:input {:class "hidden"
-                  :id (format-js "f{file_id}")
-                  :type "file"
-                  :name "file"
-                  :accept file-accept
-                  :hx-post "question-maker"
-                  :hx-encoding "multipart/form-data"
-                  :hx-vals {:old-filename filename-disp}}]
-         [:div {:class "mt-2 cursor-pointer"
-                :onclick (format-js "updateFile('{filename-disp}', 'f{file_id}')")}
-          [:div.text-center filename-disp]
-          [:img {:class "w-64"
-                 :src (format "/api/thumbnail/%s/0" file_id)}]])))]))
+  (let [files (file/get-files req project_id)]
+    (list
+     [:div.flex.items-center
+      (components/button-label "add-file" "Add file to project")
+      [:input#add-file {:class "hidden"
+                        :type "file"
+                        :name "file"
+                        :accept file-accept
+                        :hx-post "question-maker"
+                        :hx-encoding "multipart/form-data"}]]
+     [:hr.border.my-2]
+     (when (not-empty files)
+       [:p.my-2.text-gray-700 "Click on a file to update it"])
+     [:div.flex.items-center
+      (for [{:keys [file_id filename]} files]
+        (let [filename-disp (string/replace filename #"\d+.pdf" "pdf")]
+          (list
+           [:input {:class "hidden"
+                    :id (format-js "f{file_id}")
+                    :type "file"
+                    :name "file"
+                    :accept file-accept
+                    :hx-post "question-maker"
+                    :hx-encoding "multipart/form-data"
+                    :hx-vals {:old-filename filename-disp}}]
+           [:div {:class "mt-2 cursor-pointer"
+                  :onclick (format-js "updateFile('{filename-disp}', 'f{file_id}')")}
+            [:div.text-center filename-disp]
+            [:img {:class "w-64"
+                   :src (format "/api/thumbnail/%s/0" file_id)}]])))])))
 
 (defcomponent-user ^:endpoint question-maker [req file old-filename]
   (if (simpleui/post? req)

@@ -34,7 +34,7 @@ select name from project where project_id = :project_id;
 -- :name get-question :query :one
 select * from question where question_id = :question_id;
 -- :name get-questions :query
-select section.*, question from section
+select section.*, question, question_id from section
 left outer join question on section.section_id = question.section_id
 where section.project_id = :project_id;
 
@@ -55,7 +55,7 @@ update section set section = :section where section_id = :section_id;
 select * from question where project_id = :project_id and question = :question;
 
 -- :name insert-question :execute
-insert into question (project_id, question) values (:project_id, :question);
+insert into question (project_id, section_id, question) values (:project_id, :section_id, :question);
 
 -- :name update-question :execute
 update question set question = :question where question_id = :question_id;

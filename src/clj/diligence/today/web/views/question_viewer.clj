@@ -11,7 +11,7 @@
   [:form {:class "flex items-center"}
    [:div.my-6.mr-4.text-gray-500.text-4xl project-name]])
 
-(defcomponent-user ^:endpoint question-viewer [req]
+(defcomponent-user question-viewer [req]
   (let [questions (question/get-questions req project_id)
         {project-name :name} (project/get-project-by-id req project_id)]
     [:div {:_ "on click add .hidden to .drop"}
@@ -21,13 +21,16 @@
        [:img.w-16.m-2 {:src "/icon.png"}]]
       (project-ro project-name)
       (common/main-dropdown first_name project_id)]
-     [:div {:class "w-3/4 border rounded-lg mx-auto"}
+     [:div {:class "w-3/4 border rounded-md mx-auto p-1"}
       (if (empty? questions)
         [:div.text-gray-500.m-2 "Ask your admin to create questions"]
-        (for [{:keys [question_id question]} questions]
-          [:div.text-blue-800.m-2
-           [:a {:href (str "question/" question_id)}
-            question]]))]]))
+        (for [[{:keys [section]} questions] questions]
+          [:div
+           [:div.text-xl section]
+           (for [{:keys [question_id question]} questions]
+             [:div.text-blue-800.m-2
+              [:a {:href (str "question/" question_id)}
+               question]])]))]]))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
