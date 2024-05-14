@@ -33,9 +33,11 @@
   (query-fn :get-question {:question_id question_id}))
 
 (defn get-questions [{:keys [query-fn]} project_id]
-  (util/group-by-map #(select-keys % [:section :section_id])
-                     #(filter :question %)
-                     (query-fn :get-questions {:project_id project_id})))
+  (->> {:project_id project_id}
+       (query-fn :get-questions)
+       (util/group-by-map #(select-keys % [:ordering :section :section_id])
+                          #(filter :question %))
+       (sort-by #(-> % first :ordering))))
 (defn get-sections [{:keys [query-fn]} project_id]
   (query-fn :get-sections {:project_id project_id}))
 
@@ -74,6 +76,8 @@
 
 (defn update-section [{:keys [query-fn]} section_id section]
   (query-fn :update-section {:section_id section_id :section section}))
+(defn move-section [{:keys [query-fn]} mid]
+  (query-fn :move-section {:mid mid}))
 
 (defn get-editor [req question_id]
   (some-> (get-question req question_id)

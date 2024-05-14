@@ -31,3 +31,9 @@
 
 (defn group-by-map [f1 f2 s]
   (->> s (filter f1) (group-by f1) (map-vals f2)))
+
+(defn map-last [f s]
+  (map-indexed
+   (fn [i x]
+     (f (-> i inc (= (count s))) x))
+   s))

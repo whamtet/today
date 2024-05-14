@@ -43,7 +43,10 @@ select * from section where project_id = :project_id;
 
 -- :name insert-section :execute
 insert into section(project_id, section, ordering)
-select :project_id, :section, count(*) from section where project_id = :project_id;
+select :project_id, :section, count(*) * 2 from section where project_id = :project_id;
+
+-- :name move-section :execute
+update section set ordering = 2 * :mid - ordering where ordering = :mid - 1 or ordering = :mid + 1;
 
 -- :name update-section :execute
 update section set section = :section where section_id = :section_id;

@@ -87,13 +87,20 @@
   `(let [~@(mapcat command-pair commands)]
     ~@body))
 
-(defcomponent ^:endpoint section-editor [req ^:long section_id section command]
+(defcomponent ^:endpoint section-editor [req
+                                         ^:boolean last
+                                         ^:long ordering
+                                         ^:long section_id
+                                         section
+                                         command]
   (with-commands [edit update]
                  (when update? (question/update-section req section_id section))
                  (if edit?
                    [:form {:class "flex items-center justify-between w-full"
                            :hx-post "section-editor:update"
-                           :hx-vals {:section_id section_id}}
+                           :hx-vals {:last last
+                                     :ordering ordering
+                                     :section_id section_id}}
                     [:input {:class "w-full p-1 border mr-2 text-xl"
                              :name "section"
                              :value section
@@ -103,9 +110,21 @@
                           :hx-target "this"}
                     [:div.text-xl section]
                     [:div.flex
+                     (when (pos? ordering)
+                           [:div {:class "mr-2"
+                                  :hx-post "admin:move"
+                                  :hx-vals {:mid (dec ordering)}}
+                            (components/button "↑")])
+                     (when-not last
+                               [:div {:class "mr-2"
+                                      :hx-post "admin:move"
+                                      :hx-vals {:mid (inc ordering)}}
+                                (components/button "↓")])
                      [:div {:class "mr-2"
                             :hx-get "section-editor:edit"
-                            :hx-vals {:section_id section_id
+                            :hx-vals {:last last
+                                      :ordering ordering
+                                      :section_id section_id
                                       :section section}}
                       (components/button "Edit")]
                      [:div {:class ""
@@ -115,6 +134,7 @@
                       (components/button "New Question")]]])))
 
 (defcomponent ^:endpoint section-section [req
+                                          last?
                                           [base-section questions]
                                           section_id]
   (if (simpleui/delete? req)
@@ -123,7 +143,12 @@
      response/hx-refresh)
     [:div
      [:div {:class "text-gray-800 p-2 flex items-center justify-between"}
-      (section-editor req (:section_id base-section) (:section base-section) nil)
+      (section-editor req
+                      last?
+                      (:ordering base-section)
+                      (:section_id base-section)
+                      (:section base-section)
+                      nil)
       (when (empty? questions)
             [:div {:class "ml-2 cursor-pointer"
                    :hx-delete "section-section"
@@ -144,7 +169,7 @@
             :type "submit"
             :value "Edit"}]])
 
-(defcomponent-user ^:endpoint admin [req ^:long section_id command]
+(defcomponent-user ^:endpoint admin [req ^:long section_id ^:long mid command]
   project-edit
   (case command
         "new-section"
@@ -154,6 +179,10 @@
         "new-question"
         (iam/when-authorized
          (question/add-question req project_id section_id (get-in req [:headers "hx-prompt"]))
+         response/hx-refresh)
+        "move"
+        (iam/when-authorized
+         (question/move-section req mid)
          response/hx-refresh)
         (let [questions (question/get-questions req project_id)
               {project-name :name} (project/get-project-by-id req project_id)]
@@ -174,7 +203,7 @@
              (question/get-suggestions-section req project_id))]
            [:div {:class "w-3/4 border rounded-md mx-auto p-1"}
             [:div#duplicate-warning]
-            (map #(section-section req % nil) questions)
+            (util/map-last #(section-section req %1 %2 nil) questions)
             [:hr.my-4.border]
             [:div {:hx-post "admin:new-section"
                    :hx-prompt "New section name"}
