@@ -112,3 +112,7 @@
 (defn fragment-line [req {:keys [file_id page fragment]}]
   (let [{:keys [filename project_id]} (get-file req file_id)]
     (grep/fragment-line project_id filename page fragment)))
+
+(defn whole-page [req file_id page]
+  (let [{:keys [filename project_id pages pages_old]} (get-file req file_id)]
+    (grep/whole-page project_id (dec-filename-index filename) pages_old filename pages page)))

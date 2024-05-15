@@ -5,5 +5,6 @@ create table file
     project_id    integer,
     filename      text,
     pages     integer,
+    pages_old integer,
     foreign key(project_id) references project(project_id)
 );

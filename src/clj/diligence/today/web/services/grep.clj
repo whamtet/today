@@ -30,3 +30,21 @@
           (->> (.split s "\n")
                (take-while #(not (.contains % fragment)))
                count))))
+
+(defn- slurp-range [project_id filename pages]
+  (->> pages
+       range
+       (map #(slurp (grep-file project_id filename %)))))
+
+(defn- split-at3 [n s]
+  (let [[a [b & c]] (split-at n s)]
+    [b (concat a c)]))
+
+(defn whole-page [project_id f1 pages1 f2 pages2 page]
+  (let [[page others] (->> (slurp-range project_id f1 pages1)
+                           (split-at3 page))]
+    (when (every? #(not= page %) others)
+          (let [[[page2] & rest] (->> (slurp-range project_id f2 pages2)
+                                      (map-indexed list)
+                                      (filter #(-> % second (= page))))]
+            (when-not rest page2)))))
