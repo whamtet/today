@@ -1,5 +1,6 @@
 (ns diligence.today.web.views.answer.reference-modal
     (:require
+      [diligence.today.env :refer [host]]
       [diligence.today.util :as util :refer [format-js]]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.file :as file]
@@ -9,14 +10,15 @@
       [diligence.today.web.views.components :as components]
       [simpleui.response :as response]))
 
-(defcomponent ^:endpoint page-img [req ^:long file_id ^:long page ^:long offset q]
+(defcomponent ^:endpoint page-img [req ^:long file_id ^:long page ^:long offset ^:nullable q]
   (let [file (file/get-file req file_id)
         page (-> page (max 1) (min (:pages file)))]
     [:a#page-img {:href (common/href-viewer
                          {:file_id file_id
-                          :page page
+                          :page (dec page)
                           :offset offset
                           :question_id (:question_id path-params)
+                          :file (host (format-js "/api/file/{file_id}"))
                           :q q})
                   :target "_blank"}
      [:img {:class "w-80"

@@ -68,7 +68,7 @@ const addReference = () => {
     }
 }
 
-const openPage = page => window.open(viewerHref + '?page=' + page);
+const openPage = (file, page) => window.open(viewerHref + '?' + new URLSearchParams({file, page}));
 
 // refresh for references
 window.onmessage = ({data}) => {

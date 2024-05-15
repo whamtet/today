@@ -102,3 +102,8 @@
   (let [{:keys [filename project_id]} (get-file req file_id)]
     (io/input-stream
      (thumbnail/thumbnail-file project_id filename page))))
+
+(defn get-file-stream [req file_id]
+  (let [{:keys [filename project_id]} (get-file req file_id)]
+    (io/input-stream
+     (format-js "files/{project_id}/{filename}"))))

@@ -2,6 +2,7 @@
   (:require
     [diligence.today.web.controllers.file :as file]
     [diligence.today.web.controllers.health :as health]
+    [diligence.today.web.controllers.iam :as iam]
     [diligence.today.web.controllers.question :as question]
     [diligence.today.web.controllers.user :as user]
     [diligence.today.web.middleware.exception :as exception]
@@ -63,11 +64,21 @@
    ;; todo auth
    ["/question/:question_id/reference"
     (fn [req]
+      (-> req :session :user_id iam/prod-authorized!)
       (question/assoc-reference
        (assoc req :query-fn query-fn)
        (-> req :path-params :question_id Long/parseLong)
        (-> req :body-params (update :offset #(Long/parseLong %))))
       ok)]
+   ["/file/:file_id"
+    (fn [req]
+      (-> req :session :user_id iam/prod-authorized!)
+      {:status 200
+       :headers {"Content-Type" "application/pdf"}
+       :body (-> req
+                 (assoc :query-fn query-fn)
+                 (file/get-file-stream
+                  (-> req :path-params :file_id)))})]
    ;; retrievals
    ["/thumbnail/:file_id/:page"
     (fn [req]
