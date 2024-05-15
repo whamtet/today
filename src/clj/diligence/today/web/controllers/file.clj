@@ -3,6 +3,7 @@
       [clojure.string :as string]
       [clojure.java.io :as io]
       [clojure.java.shell :refer [sh]]
+      [diligence.today.web.services.grep :as grep]
       [diligence.today.web.services.thumbnail :as thumbnail]
       [diligence.today.web.services.wc :as wc]
       [diligence.today.util :refer [mk format-js]])
@@ -107,3 +108,7 @@
   (let [{:keys [filename project_id]} (get-file req file_id)]
     (io/input-stream
      (format-js "files/{project_id}/{filename}"))))
+
+(defn fragment-line [req {:keys [file_id page fragment]}]
+  (let [{:keys [filename project_id]} (get-file req file_id)]
+    (grep/fragment-line project_id filename page fragment)))

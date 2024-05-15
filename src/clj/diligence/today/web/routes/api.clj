@@ -59,7 +59,7 @@
    ["/session"
     (fn [req]
       {:status 200
-       :headers {"Content-Type" "text/html"}
+       :headers {"content-type" "text/html"}
        :body (-> req (dissoc :reitit.core/match :reitit.core/router) pr-str)})]
    ;; todo auth
    ["/question/:question_id/reference"
@@ -74,7 +74,7 @@
     (fn [req]
       (-> req :session :user_id iam/prod-authorized!)
       {:status 200
-       :headers {"Content-Type" "application/pdf"}
+       :headers {"content-type" "application/pdf"}
        :body (-> req
                  (assoc :query-fn query-fn)
                  (file/get-file-stream
@@ -84,7 +84,7 @@
     (fn [req]
       (-> req :session :user_id assert)
       {:status 200
-       :headers {"Content-Type" "image/jpg"}
+       :headers {"content-type" "image/jpg"}
        :body (-> req
                  (assoc :query-fn query-fn)
                  (file/get-thumbnail-stream

@@ -1,7 +1,8 @@
 (ns diligence.today.web.controllers.question
     (:require
       [clojure.java.io :as io]
-      [diligence.today.util :as util :refer [mk]]))
+      [diligence.today.util :as util :refer [mk]]
+      [diligence.today.web.controllers.file :as file]))
 
 (def suggestions
   (-> "suggestions.txt"
@@ -111,7 +112,10 @@
      (update :references move-references movements))))
 
 (defn assoc-reference [req question_id reference]
-  (update-editor req question_id assoc-in [:references (:offset reference)] reference))
+  (->> reference
+       (file/fragment-line req)
+       (assoc reference :line)
+       (update-editor req question_id assoc-in [:references (:offset reference)])))
 
 (defn assoc-reference-page [req
                             question_id
