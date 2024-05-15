@@ -38,7 +38,7 @@
                                           command]
   (case command
         "page-direct" (iam/when-authorized
-                       (question/assoc-reference-page req (:question_id path-params) offset selected_file page)
+                       (question/assoc-reference-page req (:question_id path-params) offset selected_file (dec page))
                        response/hx-refresh)
         (modal
          (let [files (file/get-files req project_id)

@@ -1,6 +1,7 @@
 (ns user
   "Userspace functions you can run by default in your local REPL."
   (:require
+    [clojure.java.shell :refer [sh]]
     [clojure.pprint]
     [clojure.spec.alpha :as s]
     [clojure.tools.namespace.repl :as repl]
@@ -41,7 +42,10 @@
 
 (def refresh repl/refresh)
 
-
+(defn wipe []
+  (halt)
+  (sh "rm" "-r" "today_dev.db" "files")
+  (go))
 
 (comment
   (go)

@@ -31,8 +31,8 @@
 (defn- convert-page [project_id filename]
   (fn [i]
     (sh "pdftotext"
-        "-f" (str i)
-        "-l" (str i)
+        "-f" (str (inc i))
+        "-l" (str (inc i))
         "-layout"
         (format "files/%s/%s" project_id filename)
         (text-file project_id filename i))))
@@ -50,7 +50,7 @@
        .mkdirs)
   (future
    (convert-all project_id filename)
-   (->> limit inc (range 1) (map (convert-page project_id filename)) dorun)
+   (->> limit range (map (convert-page project_id filename)) dorun)
    (wc/wc! project_id filename)))
 
 (defn- index-filename [project_id filename i]
@@ -90,6 +90,10 @@
 
 (defn get-files [{:keys [query-fn]} project_id]
   (query-fn :get-files {:project_id project_id}))
+
+(defn empty-files? [req project_id]
+  (empty?
+   (get-files req project_id)))
 
 (defn get-file [{:keys [query-fn]} file_id]
   (query-fn :get-file {:file_id file_id}))
