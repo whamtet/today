@@ -3,6 +3,7 @@
       [clojure.string :as string]
       [clojure.java.io :as io]
       [clojure.java.shell :refer [sh]]
+      [diligence.today.web.services.diff :as diff]
       [diligence.today.web.services.grep :as grep]
       [diligence.today.web.services.thumbnail :as thumbnail]
       [diligence.today.web.services.wc :as wc]
@@ -19,16 +20,6 @@
        second
        Long/parseLong))
 
-(defn- text-file [project_id filename i]
-  (format "files/%s/grep/%s/%03d.txt"
-          project_id
-          (.replaceAll filename ".pdf$" "")
-          i))
-(defn- text-file-all [project_id filename]
-  (format "files/%s/grep/%s.txt"
-          project_id
-          (.replaceAll filename ".pdf$" "")))
-
 (defn- convert-page [project_id filename]
   (fn [i]
     (sh "pdftotext"
@@ -36,13 +27,13 @@
         "-l" (str (inc i))
         "-layout"
         (format "files/%s/%s" project_id filename)
-        (text-file project_id filename i))))
+        (grep/grep-file project_id filename i))))
 
 (defn- convert-all [project_id filename]
   (sh "pdftotext"
       "-layout"
       (format "files/%s/%s" project_id filename)
-      (text-file-all project_id filename)))
+      (diff/diff-file project_id filename)))
 
 (defn- convert-pages [project_id filename limit]
   (->> (.replaceAll filename ".pdf$" "")
@@ -116,3 +107,9 @@
 (defn whole-page [req file_id page]
   (let [{:keys [filename project_id pages pages_old]} (get-file req file_id)]
     (grep/whole-page project_id (dec-filename-index filename) pages_old filename pages page)))
+
+(defn move-line [req file_id page line]
+  (let [{:keys [filename project_id]} (get-file req file_id)]
+    (->> (wc/convert project_id filename page line)
+         (diff/new-line project_id (dec-filename-index filename) filename)
+         (wc/convert project_id filename))))

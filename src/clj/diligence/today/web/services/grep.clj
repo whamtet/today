@@ -3,7 +3,7 @@
       [diligence.today.util :as util :refer [format-js]]
       [clojure.java.io :as io]))
 
-(defn- grep-file [project_id filename page]
+(defn grep-file [project_id filename page]
   (format "files/%s/grep/%s/%03d.txt"
           project_id
           (.replaceAll filename ".pdf$" "")
