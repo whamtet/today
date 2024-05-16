@@ -37,6 +37,8 @@ select * from question where question_id = :question_id;
 select section.*, question, question_id from section
 left outer join question on section.section_id = question.section_id
 where section.project_id = :project_id;
+-- :name get-questions-flat :query
+select * from question where project_id = :project_id;
 
 -- :name get-sections :query
 select * from section where project_id = :project_id;

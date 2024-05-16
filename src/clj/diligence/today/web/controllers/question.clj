@@ -33,6 +33,8 @@
 (defn get-question [{:keys [query-fn]} question_id]
   (query-fn :get-question {:question_id question_id}))
 
+(defn get-questions-flat [{:keys [query-fn]} project_id]
+  (query-fn :get-questions-flat {:project_id project_id}))
 (defn get-questions [{:keys [query-fn]} project_id]
   (->> {:project_id project_id}
        (query-fn :get-questions)
@@ -63,7 +65,7 @@
 
 (defn get-suggestions [req project_id]
   (remove
-   (->> (get-questions req project_id) (map :question) set)
+   (->> (get-questions-flat req project_id) (map :question) set)
    suggestions))
 
 (defn get-suggestions-section [req project_id]
@@ -88,6 +90,12 @@
 (defn set-editor [{:keys [query-fn]} question_id editor]
   (query-fn :update-editor {:question_id question_id
                             :editor (pr-str editor)}))
+
+(defn get-questions-file [req project_id file_id]
+  (->> (get-questions-flat req project_id)
+       (map #(update % :editor read-string))
+       (filter (fn [{:keys [editor]}]
+                 (->> editor vals (some #(-> % :file_id (= file_id))))))))
 
 (defn- update-editor [req question_id f & args]
   (set-editor
