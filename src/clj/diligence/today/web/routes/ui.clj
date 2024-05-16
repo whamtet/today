@@ -6,7 +6,6 @@
    [diligence.today.web.views.admin-file :as admin-file]
    [diligence.today.web.views.answer :as answer]
    [diligence.today.web.views.home :as home]
-   [diligence.today.web.views.migrate :as migrate]
    [diligence.today.web.views.pdf-viewer :as pdf-viewer]
    [diligence.today.web.views.question-viewer :as question-viewer]
    [integrant.core :as ig]
@@ -51,6 +50,5 @@
    ["/project/:project_id" (route-data-redirect opts) (question-viewer/ui-routes opts)]
    ["/project/:project_id/admin" (route-data-redirect opts) (admin/ui-routes opts)]
    ["/project/:project_id/admin-file" (route-data-redirect opts) (admin-file/ui-routes opts)]
-   ["/project/:project_id/migrate/:new-file" (route-data-redirect opts) (migrate/ui-routes opts)]
    ["/project/:project_id/question/:question_id" (route-data-redirect opts) (answer/ui-routes opts)]
    ["/pdf-viewer" (route-data opts) (pdf-viewer/ui-routes opts)]])

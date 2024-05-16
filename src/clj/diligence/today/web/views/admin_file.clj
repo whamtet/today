@@ -4,6 +4,7 @@
       [diligence.today.util :as util :refer [format-js]]
       [diligence.today.web.controllers.file :as file]
       [diligence.today.web.controllers.iam :as iam]
+      [diligence.today.web.controllers.question.migrate :as migrate]
       [diligence.today.web.controllers.project :as project]
       [diligence.today.web.htmx :refer [page-htmx defcomponent-user]]
       [diligence.today.web.views.common :as common]
@@ -47,8 +48,9 @@
 (defcomponent-user ^:endpoint question-maker [req file old-filename]
   (if (simpleui/post? req)
     (iam/when-authorized
-     (if-let [migration-file (file/copy-file req project_id file old-filename)]
-       (response/hx-redirect (format "../migrate/%s/" migration-file))
+     (if-let [file_id (migrate/migrate-file req project_id file old-filename)]
+       (response/hx-redirect (common/href-viewer {:migrate true
+                                                  :file_id file_id}))
        response/hx-refresh))
     (let [{project-name :name} (project/get-project-by-id req project_id)]
       [:div {:_ "on click add .hidden to .drop"}

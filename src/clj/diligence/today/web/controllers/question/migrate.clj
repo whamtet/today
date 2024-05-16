@@ -27,9 +27,7 @@
      #(->> % :editor vals (some :migration-pending?))
      migrated)))
 
-
-(defn mark-migrated [req project_id file_id]
-  (doseq [{:keys [question_id editor]} (question/get-questions-file req project_id file_id)]
-    (->> editor
-         (util/map-vals (migrate-editor req))
-         (question/set-editor req question_id))))
+(defn migrate-file [req project_id file old-filename]
+  (when-let [file_id (file/copy-file req project_id file old-filename)]
+    (when (migrate-questions req project_id file_id)
+          file_id)))

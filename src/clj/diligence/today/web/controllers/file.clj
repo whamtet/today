@@ -71,11 +71,11 @@
     (let [pages (num-pages project_id filename)]
       (convert-pages project_id filename pages)
       (if (pos? index)
-        (do
-          (query-fn :update-file {:filename filename
-                                  :pages pages
-                                  :old-filename (dec-filename-index filename)})
-          filename)
+        (-> (query-fn :update-file {:filename filename
+                                    :pages pages
+                                    :old-filename (dec-filename-index filename)})
+            first
+            :file_id)
         (do
           (query-fn :insert-file (mk project_id filename pages))
           nil)))))
