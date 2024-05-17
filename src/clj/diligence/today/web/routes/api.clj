@@ -1,5 +1,6 @@
 (ns diligence.today.web.routes.api
   (:require
+    [diligence.today.env :refer [dev?]]
     [diligence.today.web.controllers.file :as file]
     [diligence.today.web.controllers.health :as health]
     [diligence.today.web.controllers.iam :as iam]
@@ -68,8 +69,18 @@
       (question/assoc-reference
        (assoc req :query-fn query-fn)
        (-> req :path-params :question_id Long/parseLong)
-       (-> req :body-params (update :offset #(Long/parseLong %))))
+       (:body-params req))
       ok)]
+   (when dev?
+         ["/test-reference"
+          (fn [req]
+            (question/set-editor
+             (assoc req :query-fn query-fn)
+             1
+             {:text "Write your answer here...",
+              :references {5 {:offset 5, :fragment "Page 1", :page 0, :line 0, :file_id 1},
+                           26 {:offset 26, :fragment "Page 2", :page 1, :line 0, :file_id 1}}})
+            ok)])
    ["/file/:file_id"
     (fn [req]
       (-> req :session :user_id iam/prod-authorized!)

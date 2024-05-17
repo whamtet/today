@@ -120,10 +120,12 @@
      (update :references move-references movements))))
 
 (defn assoc-reference [req question_id reference]
-  (->> reference
-       (file/fragment-line req)
-       (assoc reference :line)
-       (update-editor req question_id assoc-in [:references (:offset reference)])))
+  (-> reference
+      (update :offset #(Long/parseLong %))
+      (update :file_id #(Long/parseLong %))
+      (->> (file/fragment-line req)
+           (assoc reference :line)
+           (update-editor req question_id assoc-in [:references (:offset reference)]))))
 
 (defn assoc-reference-page [req
                             question_id
