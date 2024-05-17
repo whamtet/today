@@ -1,7 +1,8 @@
 (ns diligence.today.web.views.admin
     (:require
       [clojure.string :as string]
-      [diligence.today.util :as util]
+      [diligence.today.env :refer [dev?]]
+      [diligence.today.util :as util :refer [format-json]]
       [diligence.today.web.controllers.file :as file]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.project :as project]
@@ -118,6 +119,11 @@
                                       :section_id section_id
                                       :section section}}
                       (components/button "Edit")]
+                     (when dev?
+                           [:script
+                            (format-json "newQuestion = () => hxPost('admin:new-question', %s);"
+                                         {:section_id section_id
+                                          :question "Question1"})])
                      [:div {:class ""
                             :hx-post "admin:new-question"
                             :hx-prompt "New question name"
@@ -149,16 +155,21 @@
      [:hr.border.my-2]
      (rt/map-indexed question-editor req questions)]))
 
-(defcomponent-user ^:endpoint admin [req ^:long section_id ^:long mid command]
+(defcomponent-user ^:endpoint admin [req
+                                     ^:prompt section
+                                     ^:prompt question
+                                     ^:long section_id
+                                     ^:long mid
+                                     command]
   project-edit
   (case command
         "new-section"
         (iam/when-authorized
-         (question/insert-section req project_id (get-in req [:headers "hx-prompt"]))
+         (question/insert-section req project_id section)
          response/hx-refresh)
         "new-question"
         (iam/when-authorized
-         (question/add-question req project_id section_id (get-in req [:headers "hx-prompt"]))
+         (question/add-question req project_id section_id question)
          response/hx-refresh)
         "move"
         (iam/when-authorized
@@ -185,6 +196,10 @@
             [:div#duplicate-warning]
             (util/map-last #(section-section req %1 %2 nil) questions)
             [:hr.my-4.border]
+            (when dev?
+                  [:script
+                   (format-json "newSection = () => hxPost('admin:new-section', %s);"
+                                {:section "Section1"})])
             [:div {:hx-post "admin:new-section"
                    :hx-prompt "New section name"}
              (components/button "Add Section")]]])))

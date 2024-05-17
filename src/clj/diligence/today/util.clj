@@ -1,5 +1,6 @@
 (ns diligence.today.util
   (:require
+    [clojure.data.json :as json]
     [clojure.string :as string]
     [diligence.today.env :refer [dev?]]))
 
@@ -22,6 +23,11 @@
   `(-> ~s
     ~@(for [[to-replace replacement] (re-seq #"\{([^\}]+)}" s)]
        `(string/replace-first ~to-replace ~(read-string replacement)))))
+
+(defn format-json [fmt & args]
+  (->> args
+       (map json/write-str)
+       (apply format fmt)))
 
 (defn some-item [f s]
   (some #(when (f %) %) s))
