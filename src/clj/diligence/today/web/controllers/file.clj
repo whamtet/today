@@ -44,6 +44,7 @@
   (->> limit range (map (convert-page project_id filename)) dorun)
   (wc/wc! project_id filename))
 
+;; todo: generate our own storage filenames
 (defn- index-filename [project_id filename i]
   (assert (.endsWith filename ".pdf"))
   (let [truncated (.replaceAll filename ".pdf$" "")
@@ -113,6 +114,6 @@
 
 (defn move-line [req file_id page line]
   (let [{:keys [filename project_id]} (get-file req file_id)]
-    (->> (wc/convert project_id filename page line)
-         (diff/new-line project_id (dec-filename-index filename) filename)
-         (wc/convert project_id filename))))
+    (some->> (wc/convert project_id filename page line)
+             (diff/new-line project_id (dec-filename-index filename) filename)
+             (wc/convert project_id filename))))

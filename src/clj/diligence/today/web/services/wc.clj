@@ -15,7 +15,7 @@
 (defn wc! [project_id filename]
   (sh "bash"
       "-c"
-      (format-js "wc -l '{(wc-src project_id filename)}' > '{(wc-file project_id filename)}'")))
+      (format-js "wc -l {(wc-src project_id filename)} > '{(wc-file project_id filename)}'")))
 
 (defn- wc [project_id filename]
   (->> (wc-file project_id filename)

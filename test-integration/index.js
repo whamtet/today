@@ -3,6 +3,8 @@ const {assert} = require('chai');
 
 const base = 'http://localhost:3000';
 const goto = (page, href) => page.goto(base + href);
+
+const get = url => fetch(base + url);
 const post = url => fetch(base + url, {method: 'POST'});
 
 const timeout = x => new Promise(resolve => setTimeout(resolve, x));
@@ -48,6 +50,13 @@ const $reload = async (page, selector) => {
   await goto(page, '/project/1/admin-file');
   let reuploader = await $reload(page, '#f1');
   await reuploader.uploadFile('files/simple-swap.pdf');
+
+  // again with the second file
+  reuploader = await $reload(page, '#f1');
+  await reuploader.uploadFile('files/simplea.pdf');
+
+  await timeout(1000);
+  get('/api/test-reference'); // print internally
 
   console.log('all tests passed');
 

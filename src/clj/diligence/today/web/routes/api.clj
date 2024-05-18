@@ -73,14 +73,20 @@
       ok)]
    (when dev?
          ["/test-reference"
-          (fn [req]
-            (question/set-editor
-             (assoc req :query-fn query-fn)
-             1
-             {:text "Write your answer here...",
-              :references {5 {:offset 5, :fragment "Page 1", :page 0, :line 0, :file_id 1},
-                           26 {:offset 26, :fragment "Page 2", :page 1, :line 0, :file_id 1}}})
-            ok)])
+          {:post (fn [req]
+                   (question/set-editor
+                    (assoc req :query-fn query-fn)
+                    1
+                    {:text "Write your answer here...",
+                     :references {5 {:offset 5, :fragment "Page 1", :page 0, :line 0, :file_id 1},
+                                  26 {:offset 26, :fragment "Page 2", :page 1, :line 0, :file_id 1}}})
+                   ok)
+           :get (fn [req]
+                  (-> req
+                      (assoc :query-fn query-fn)
+                      (question/get-editor 1)
+                      prn)
+                  ok)}])
    ["/file/:file_id"
     (fn [req]
       (-> req :session :user_id iam/prod-authorized!)
