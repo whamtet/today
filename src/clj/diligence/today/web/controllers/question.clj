@@ -1,7 +1,7 @@
 (ns diligence.today.web.controllers.question
     (:require
       [clojure.java.io :as io]
-      [diligence.today.util :as util :refer [mk]]
+      [diligence.today.util :as util :refer [mk mk-assoc]]
       [diligence.today.web.controllers.file :as file]))
 
 (def suggestions
@@ -98,10 +98,11 @@
                  (->> editor :references vals (some #(-> % :file_id (= file_id))))))))
 
 (defn get-pending-file [req project_id file_id]
-  (for [{:keys [question_id editor]} (get-questions-flat req project_id)
-        reference (-> editor read-string :references vals)
+  (for [{:keys [question_id question editor]} (get-questions-flat req project_id)
+        :let [{:keys [text references]} (read-string editor)]
+        reference (vals references)
         :when (:migration-pending? reference)]
-    (assoc reference :question_id question_id)))
+    (mk-assoc reference question_id question_id question text)))
 
 (defn- update-editor [req question_id f & args]
   (set-editor

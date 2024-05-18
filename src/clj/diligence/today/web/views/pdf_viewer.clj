@@ -1,6 +1,7 @@
 (ns diligence.today.web.views.pdf-viewer
     (:require
       [diligence.today.env :refer [host]]
+      [diligence.today.util :as util]
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.fragment :as fragment]
       [diligence.today.web.controllers.question :as question]
@@ -13,13 +14,13 @@
       [simpleui.response :as response]))
 
 (defn- inset-disp [& body]
-  [:div#inset {:class "p-2 overflow-y-auto overflow-x-clip
+  [:div {:class "draggable p-2 overflow-y-auto overflow-x-clip
   border bg-white fixed"
-               :hx-target "this"
                :style "top: 50px;
 right: 100px;
-width: 500px;
-height: 300px;"} body])
+width: 700px;
+height: 300px;"}
+   [:div {:hx-target "this"} body]])
 
 (defn- parse-search [s]
   (into {}
@@ -30,13 +31,29 @@ height: 300px;"} body])
                (Long/parseLong v)
                v)]))))
 
+(def drag-scripts
+  (list
+   [:script {:src "https://unpkg.com/interactjs/dist/interact.min.js"}]
+   [:script {:src "matt/drag.js"}]))
+
+(defmacro if-init [body]
+  `(if (simpleui/get? ~'req)
+    (list
+     (inset-disp ~body)
+      drag-scripts)
+    ~body))
+
 (defcomponent ^:endpoint inset [{:keys [headers] :as req}
                                 ^:long disp-index]
   (let [{:keys [project_id file_id]} (-> "hx-current-url" headers (.split "\\?") last parse-search)
-        ]
-    [:div
-     (inset-disp (pr-str (question/get-pending-file req project_id file_id)))
-     [:div#modal.hidden]]))
+        to-migrate (question/get-pending-file req project_id file_id)
+        current-question (->> (util/bind 0 (or disp-index 0) (count to-migrate))
+                              (nth to-migrate))]
+    (list
+     [:script (->> to-migrate count (= 1) (format "is_final = %s"))]
+     (if-init
+      [:div {:hx-target "this"}
+       (pr-str current-question)]))))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes-simple

@@ -12,12 +12,17 @@
 
 (defmacro mk [& syms]
   (zipmap (map keyword syms) syms))
+(defmacro mk-assoc [m & syms]
+  `(merge ~m (mk ~@syms)))
 
 (defn uniqueness-violation? [e]
   (-> e str (.contains "SQLITE_CONSTRAINT_UNIQUE")))
 
 (defn key-by [f s]
   (zipmap (map f s) s))
+
+(defn bind [a x b]
+  (-> x (max a) (min b)))
 
 (defmacro format-js [s]
   `(-> ~s
