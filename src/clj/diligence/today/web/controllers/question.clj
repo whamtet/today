@@ -97,6 +97,12 @@
        (filter (fn [{:keys [editor]}]
                  (->> editor :references vals (some #(-> % :file_id (= file_id))))))))
 
+(defn get-pending-file [req project_id file_id]
+  (for [{:keys [question_id editor]} (get-questions-flat req project_id)
+        reference (-> editor read-string :references vals)
+        :when (:migration-pending? reference)]
+    (assoc reference :question_id question_id)))
+
 (defn- update-editor [req question_id f & args]
   (set-editor
    req

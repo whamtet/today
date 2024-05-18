@@ -1,6 +1,7 @@
 (ns diligence.today.web.views.admin-file
     (:require
       [clojure.string :as string]
+      [diligence.today.env :as env]
       [diligence.today.util :as util :refer [format-js]]
       [diligence.today.web.controllers.file :as file]
       [diligence.today.web.controllers.iam :as iam]
@@ -50,7 +51,9 @@
     (iam/when-authorized
      (if-let [file_id (migrate/migrate-file req project_id file old-filename)]
        (response/hx-redirect (common/href-viewer {:migrate true
-                                                  :file_id file_id}))
+                                                  :file_id file_id
+                                                  :project_id project_id
+                                                  :file (env/host "/api/file/" file_id)}))
        response/hx-refresh))
     (let [{project-name :name} (project/get-project-by-id req project_id)]
       [:div {:_ "on click add .hidden to .drop"}

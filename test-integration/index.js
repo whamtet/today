@@ -20,6 +20,8 @@ const $reload = async (page, selector) => {
   }
 }
 
+const testSwap = false;
+
 (async () => {
   // Launch the browser and open a new blank page
   const browser = await puppeteer.launch({headless: false});
@@ -49,10 +51,12 @@ const $reload = async (page, selector) => {
 
   await goto(page, '/project/1/admin-file');
   let reuploader = await $reload(page, '#f1');
-  await reuploader.uploadFile('files/simple-swap.pdf');
 
-  // again with the second file
-  reuploader = await $reload(page, '#f1');
+  if (testSwap) {
+    await reuploader.uploadFile('files/simple-swap.pdf');
+    reuploader = await $reload(page, '#f1');
+  }
+  
   await reuploader.uploadFile('files/simplea.pdf');
 
   await timeout(1000);

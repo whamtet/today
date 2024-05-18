@@ -24,7 +24,7 @@
     (doseq [{:keys [question_id editor]} migrated]
       (question/set-editor req question_id editor))
     (some
-     #(->> % :editor vals (some :migration-pending?))
+     #(->> % :editor :references vals (some :migration-pending?))
      migrated)))
 
 (defn migrate-file [req project_id file old-filename]

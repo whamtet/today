@@ -16,5 +16,5 @@
 
 (def dev? true)
 (def prod? false)
-(defn host [s]
-  (str "http://localhost:3000" s))
+(defn host [& strs]
+  (apply str "http://localhost:3000" strs))
