@@ -40,10 +40,9 @@
        (format "files/%s/grep/%s" project_id)
        File.
        .mkdirs)
-  (future
-   (convert-all project_id filename)
-   (->> limit range (map (convert-page project_id filename)) dorun)
-   (wc/wc! project_id filename)))
+  (convert-all project_id filename)
+  (->> limit range (map (convert-page project_id filename)) dorun)
+  (wc/wc! project_id filename))
 
 (defn- index-filename [project_id filename i]
   (assert (.endsWith filename ".pdf"))
@@ -63,13 +62,17 @@
        (format "%02d.pdf")
        (string/replace filename suffix-match)))
 
+(defmacro if-index [body]
+  `(if (zero? ~'index)
+    (future ~body)
+    ~body))
 (defn copy-file [{:keys [query-fn]} project_id {:keys [tempfile filename]} old-filename]
   (let [[filename index] (index-filename project_id (or old-filename filename) 0)]
-    (.mkdirs (File. files project_id))
+    (.mkdirs (File. files (str project_id)))
     (io/copy tempfile (File. files (str project_id "/" filename)))
     (thumbnail/thumbnails project_id filename)
     (let [pages (num-pages project_id filename)]
-      (convert-pages project_id filename pages)
+      (if-index (convert-pages project_id filename pages))
       (if (pos? index)
         (-> (query-fn :update-file {:filename filename
                                     :pages pages

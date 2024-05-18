@@ -16,10 +16,10 @@
 (defn migrate-questions [req project_id file_id]
   (let [migrated (map
                   (fn [question]
-                    (update question
-                            :editor
-                            (fn [editor]
-                              (util/map-vals #(migrate-editor-value req file_id %) editor))))
+                    (update-in question
+                               [:editor :references]
+                               (fn [references]
+                                 (util/map-vals #(migrate-editor-value req file_id %) references))))
                   (question/get-questions-file req project_id file_id))]
     (doseq [{:keys [question_id editor]} migrated]
       (question/set-editor req question_id editor))

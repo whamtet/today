@@ -95,7 +95,7 @@
   (->> (get-questions-flat req project_id)
        (map #(update % :editor read-string))
        (filter (fn [{:keys [editor]}]
-                 (->> editor vals (some #(-> % :file_id (= file_id))))))))
+                 (->> editor :references vals (some #(-> % :file_id (= file_id))))))))
 
 (defn- update-editor [req question_id f & args]
   (set-editor
