@@ -46,8 +46,21 @@ height: 300px;"}
          :hx-vals {:disp-index (inc disp-index)}}
    icons/right-arrow])
 
+[:sup.text-red-500.text-xl]
+(defn insert-sup [text offset index]
+  (let [offset (min offset (count text))]
+    (str
+     (.substring text 0 offset)
+     "<sup class=\"text-red-500 text-xl\">" (inc index) "</sup>"
+     (when (< offset (count text))
+           (.substring text offset)))))
+
 (defcomponent ^:endpoint inset [{:keys [headers] :as req}
+                                ^:long question_id
+                                ^:json values
                                 ^:long disp-index]
+  (when question_id
+        (question/assoc-reference req question_id values))
   (let [{:keys [project_id file_id]} (-> "hx-current-url"
                                          headers
                                          (.split "\\?")
@@ -56,19 +69,28 @@ height: 300px;"}
         to-migrate (question/get-pending-file req project_id file_id)
         max-index (dec (count to-migrate))
         disp-index (or disp-index 0)
-        {:keys [text question offset]} (->> (util/bind 0 disp-index max-index)
-                                     (nth to-migrate))]
-    (list
-     [:script (->> to-migrate count (= 1) (format "is_final = %s"))]
-     (if-init
-      [:div {:hx-target "this"}
-       [:h3.text-gray-500 question]
-       (for [paragraph (.split text "\n")]
-         [:p.mt-2 paragraph])
-       [:div.flex.absolute.left-2.bottom-2
-        (when (pos? disp-index) (left-arrow (dec disp-index)))
-        (when (< disp-index max-index) (right-arrow (inc disp-index)))]
-       ]))))
+        {:keys [text question offset index
+                question_id]}
+        (some-> to-migrate not-empty (nth (util/bind 0 disp-index max-index)))]
+    (if (empty? to-migrate)
+      (->> project_id (format "/project/%s/admin-file/") host response/hx-redirect)
+      (list
+       [:script
+        (format "migration_offset = %s;" offset)]
+       (if-init
+        [:div {:hx-target "this"}
+         [:form {:class "hidden"
+                 :id "values-form"
+                 :hx-post "inset"}
+          [:input {:type "hidden" :name "question_id" :value question_id}]
+          [:input#values {:type "hidden" :name "values"}]]
+         [:h3.text-gray-500 question]
+         (for [paragraph (.split (insert-sup text offset index) "\n")]
+           [:p.mt-2 paragraph])
+         [:div.flex.absolute.left-2.bottom-2
+          (when (pos? disp-index) (left-arrow (dec disp-index)))
+          (when (< disp-index max-index) (right-arrow (inc disp-index)))]
+         ])))))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes-simple

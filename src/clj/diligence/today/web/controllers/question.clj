@@ -98,11 +98,17 @@
                  (->> editor :references vals (some #(-> % :file_id (= file_id))))))))
 
 (defn get-pending-file [req project_id file_id]
-  (for [{:keys [question_id question editor]} (get-questions-flat req project_id)
-        :let [{:keys [text references]} (read-string editor)]
-        reference (vals references)
-        :when (:migration-pending? reference)]
-    (mk-assoc reference question_id question_id question text)))
+  (mapcat
+   (fn [{:keys [question_id question editor]}]
+     (let [{:keys [text references]} (read-string editor)]
+       (->> references
+            (sort-by first)
+            (map-indexed
+             (fn [index [_ reference]]
+               (mk-assoc reference
+                         index reference question_id question text)))
+            (filter :migration-pending?))))
+   (get-questions-flat req project_id)))
 
 (defn- update-editor [req question_id f & args]
   (set-editor
@@ -127,12 +133,9 @@
      (update :references move-references movements))))
 
 (defn assoc-reference [req question_id reference]
-  (-> reference
-      (update :offset #(Long/parseLong %))
-      (update :file_id #(Long/parseLong %))
-      (->> (file/fragment-line req)
-           (assoc reference :line)
-           (update-editor req question_id assoc-in [:references (:offset reference)]))))
+  (->> (file/fragment-line req reference)
+       (assoc reference :line)
+       (update-editor req question_id assoc-in [:references (:offset reference)])))
 
 (defn assoc-reference-page [req
                             question_id

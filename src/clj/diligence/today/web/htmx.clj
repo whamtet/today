@@ -34,7 +34,7 @@
     [:meta {:charset "UTF-8"}]
     [:title "SimplifyDD"]
     [:link {:rel "icon" :href "/icon.png"}]
-    (output)]
+    (output "")]
    [:body
     [:div#modal.hidden]
     (render/walk-attrs body)

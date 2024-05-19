@@ -45,3 +45,4 @@
   (start-app))
 
 (simpleui.config/set-render-oob true)
+(simpleui.config/set-render-safe false)

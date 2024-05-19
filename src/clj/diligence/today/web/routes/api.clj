@@ -62,7 +62,6 @@
       {:status 200
        :headers {"content-type" "text/html"}
        :body (-> req (dissoc :reitit.core/match :reitit.core/router) pr-str)})]
-   ;; todo auth
    ["/question/:question_id/reference"
     (fn [req]
       (-> req :session :user_id iam/prod-authorized!)
@@ -87,6 +86,16 @@
                       (question/get-editor 1)
                       prn)
                   ok)}])
+   (when dev?
+         ["/test-reference2"
+          (fn [req]
+            (question/set-editor
+             (assoc req :query-fn query-fn)
+             1
+             {:text "Write your answer here...", :references {5 {:offset 5, :fragment "Page 1", :page 0, :line 0, :file_id 1, :migration-pending? true},
+                                                              26 {:offset 26, :fragment "Page 2", :page 1, :line 0, :file_id 1 :migration-pending? true}}})
+            (response/redirect
+              "http://localhost:8888/web/index.html?migrate=true&file_id=1&project_id=1&file=http://localhost:3000/api/file/1"))])
    ["/file/:file_id"
     (fn [req]
       (-> req :session :user_id iam/prod-authorized!)

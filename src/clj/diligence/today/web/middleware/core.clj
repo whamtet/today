@@ -7,7 +7,8 @@
 (def cors-headers
   {"Access-Control-Allow-Origin" "*"
    "Access-Control-Allow-Methods" "POST, GET, OPTIONS, DELETE"
-   "Access-Control-Allow-Headers" "*"})
+   "Access-Control-Allow-Headers" "*"
+   "Access-Control-Expose-Headers" "*"})
 
 (defn wrap-cors [handler]
   (fn [req]
@@ -24,7 +25,7 @@
   (let [cookie-store (cookie/cookie-store {:key (.getBytes ^String cookie-secret)})]
     (fn [handler]
       (cond-> ((:middleware env/defaults) handler opts)
-              true wrap-cors
+              env/dev? wrap-cors
               true (defaults/wrap-defaults
                      (assoc-in site-defaults-config [:session :store] cookie-store))
               ))))
