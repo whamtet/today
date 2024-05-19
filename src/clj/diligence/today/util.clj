@@ -48,3 +48,12 @@
    (fn [i x]
      (f (-> i inc (= (count s))) x))
    s))
+
+(defn parse-search [s]
+  (into {}
+        (for [kv (.split s "&")]
+          (let [[k v] (.split kv "=")]
+            [(keyword k)
+             (if (re-find #"^\d" v)
+               (Long/parseLong v)
+               v)]))))

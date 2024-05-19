@@ -5,7 +5,7 @@
       [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.fragment :as fragment]
       [diligence.today.web.controllers.question :as question]
-      [diligence.today.web.htmx :refer [defcomponent]]
+      [diligence.today.web.htmx :refer [output defcomponent]]
       [diligence.today.web.views.common :as common]
       [diligence.today.web.views.components :as components]
       [diligence.today.web.views.dropdown :as dropdown]
@@ -22,15 +22,6 @@ width: 700px;
 height: 300px;"}
    [:div {:hx-target "this"} body]])
 
-(defn- parse-search [s]
-  (into {}
-        (for [kv (.split s "&")]
-          (let [[k v] (.split kv "=")]
-            [(keyword k)
-             (if (re-find #"^\d" v)
-               (Long/parseLong v)
-               v)]))))
-
 (def drag-scripts
   (list
    [:script {:src "https://unpkg.com/interactjs/dist/interact.min.js"}]
@@ -39,21 +30,45 @@ height: 300px;"}
 (defmacro if-init [body]
   `(if (simpleui/get? ~'req)
     (list
+     (output (host))
      (inset-disp ~body)
       drag-scripts)
     ~body))
 
+(defn left-arrow [disp-index]
+  [:div {:class "cursor-pointer"
+         :hx-post "inset"
+         :hx-vals {:disp-index (dec disp-index)}}
+   icons/left-arrow])
+(defn right-arrow [disp-index]
+  [:div {:class "curosr-pointer"
+         :hx-post "inset"
+         :hx-vals {:disp-index (inc disp-index)}}
+   icons/right-arrow])
+
 (defcomponent ^:endpoint inset [{:keys [headers] :as req}
                                 ^:long disp-index]
-  (let [{:keys [project_id file_id]} (-> "hx-current-url" headers (.split "\\?") last parse-search)
+  (let [{:keys [project_id file_id]} (-> "hx-current-url"
+                                         headers
+                                         (.split "\\?")
+                                         last
+                                         util/parse-search)
         to-migrate (question/get-pending-file req project_id file_id)
-        current-question (->> (util/bind 0 (or disp-index 0) (count to-migrate))
-                              (nth to-migrate))]
+        max-index (dec (count to-migrate))
+        disp-index (or disp-index 0)
+        {:keys [text question offset]} (->> (util/bind 0 disp-index max-index)
+                                     (nth to-migrate))]
     (list
      [:script (->> to-migrate count (= 1) (format "is_final = %s"))]
      (if-init
       [:div {:hx-target "this"}
-       (pr-str current-question)]))))
+       [:h3.text-gray-500 question]
+       (for [paragraph (.split text "\n")]
+         [:p.mt-2 paragraph])
+       [:div.flex.absolute.left-2.bottom-2
+        (when (pos? disp-index) (left-arrow (dec disp-index)))
+        (when (< disp-index max-index) (right-arrow (inc disp-index)))]
+       ]))))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes-simple

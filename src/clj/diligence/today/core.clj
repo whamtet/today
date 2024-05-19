@@ -4,6 +4,7 @@
     [integrant.core :as ig]
     [diligence.today.config :as config]
     [diligence.today.env :refer [defaults]]
+    simpleui.config
 
     ;; Edges
     [kit.edge.server.undertow]
@@ -42,3 +43,5 @@
 
 (defn -main [& _]
   (start-app))
+
+(simpleui.config/set-render-oob true)

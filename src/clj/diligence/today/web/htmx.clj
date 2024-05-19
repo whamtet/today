@@ -24,13 +24,17 @@
                         [:script {:src (unminify "https://unpkg.com/hyperscript.org@0.9.12/dist/_hyperscript.min.js")}])
           google? (conj [:script {:src "https://accounts.google.com/gsi/client" :async true :defer true}])))
 
+(defn output [prefix]
+  [:link {:rel "stylesheet"
+          :href (str prefix
+                     (resource-cache/cache-suffix "/output.css"))}])
 (defn page-htmx [options & body]
   (page
    [:head
     [:meta {:charset "UTF-8"}]
     [:title "SimplifyDD"]
     [:link {:rel "icon" :href "/icon.png"}]
-    [:link {:rel "stylesheet" :href (resource-cache/cache-suffix "/output.css")}]]
+    (output)]
    [:body
     [:div#modal.hidden]
     (render/walk-attrs body)
