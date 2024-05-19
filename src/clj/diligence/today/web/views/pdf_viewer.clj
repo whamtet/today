@@ -55,68 +55,56 @@ height: 300px;"}
      (when (< offset (count text))
            (.substring text offset)))))
 
-(defn- parse-current-url [req]
-  (-> (get-in req [:headers "hx-current-url"])
-      (.split "\\?")
-      last
-      util/parse-search))
-
-(defmacro with-src-params [req & body]
-  `(let [~'src-params (parse-current-url ~req)]
-    ~@body))
-
 (defcomponent ^:endpoint inset [req
                                 ^:long question_id
                                 ^:json values
                                 ^:long disp-index]
   (when question_id
         (question/assoc-reference req question_id values))
-  (with-src-params req
-                   (let [{:keys [project_id file_id]} src-params
-                         to-migrate (question/get-pending-file req project_id file_id)
-                         max-index (dec (count to-migrate))
-                         disp-index (or disp-index 0)
-                         {:keys [text question offset index
-                                 question_id]}
-                         (some-> to-migrate not-empty (nth (util/bind 0 disp-index max-index)))]
-                     (if (empty? to-migrate)
-                       (->> project_id (format "/project/%s/admin-file/") host response/hx-redirect)
-                       (list
-                        [:script
-                         (format "migration_offset = %s;" offset)]
-                        (if-init
-                         [:div {:hx-target "this"}
-                          [:form {:class "hidden"
-                                  :id "values-form"
-                                  :hx-post "inset"}
-                           [:input {:type "hidden" :name "question_id" :value question_id}]
-                           [:input#values {:type "hidden" :name "values"}]]
-                          [:h3.text-gray-500 question]
-                          (for [paragraph (.split (insert-sup text offset index) "\n")]
-                            [:p.mt-2 paragraph])
-                          [:div.flex.absolute.left-2.bottom-2
-                           (when (pos? disp-index) (left-arrow (dec disp-index)))
-                           (when (< disp-index max-index) (right-arrow (inc disp-index)))]
-                          ]))))))
+  (let [{:keys [project_id file_id]} (:src-params req)
+        to-migrate (question/get-pending-file req project_id file_id)
+        max-index (dec (count to-migrate))
+        disp-index (or disp-index 0)
+        {:keys [text question offset index
+                question_id]}
+        (some-> to-migrate not-empty (nth (util/bind 0 disp-index max-index)))]
+    (if (empty? to-migrate)
+      (->> project_id (format "/project/%s/admin-file/") host response/hx-redirect)
+      (list
+       [:script
+        (format "migration_offset = %s;" offset)]
+       (if-init
+        [:div {:hx-target "this"}
+         [:form {:class "hidden"
+                 :id "values-form"
+                 :hx-post "inset"}
+          [:input {:type "hidden" :name "question_id" :value question_id}]
+          [:input#values {:type "hidden" :name "values"}]]
+         [:h3.text-gray-500 question]
+         (for [paragraph (.split (insert-sup text offset index) "\n")]
+           [:p.mt-2 paragraph])
+         [:div.flex.absolute.left-2.bottom-2
+          (when (pos? disp-index) (left-arrow (dec disp-index)))
+          (when (< disp-index max-index) (right-arrow (inc disp-index)))]
+         ])))))
 
 (defcomponent ^:endpoint pdf-viewer [req
                                      ^:long question_id
                                      ^:json values]
-  (with-src-params req
-                   (if question_id
-                     (let [[{:keys [project_id]}] (question/assoc-reference
-                                                   req
-                                                   question_id
-                                                   values)]
-                       (response/hx-redirect
-                        (host (format-js "/project/{project_id}/question/{question_id}/"))))
-                     (if (:migrate src-params)
-                       (inset req)
-                       [:form {:class "hidden"
-                               :id "values-form"
-                               :hx-post "pdf-viewer"
-                               :hx-vals {:question_id (:question_id src-params)}}
-                        [:input#values {:type "hidden" :name "values"}]]))))
+  (if question_id
+    (let [[{:keys [project_id]}] (question/assoc-reference
+                                  req
+                                  question_id
+                                  values)]
+      (response/hx-redirect
+       (host (format-js "/project/{project_id}/question/{question_id}/"))))
+    (if (-> req :src-params :migrate)
+      (inset req)
+      [:form {:class "hidden"
+              :id "values-form"
+              :hx-post "pdf-viewer"
+              :hx-vals {:question_id (-> req :src-params :question_id)}}
+       [:input#values {:type "hidden" :name "values"}]])))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes-simple
