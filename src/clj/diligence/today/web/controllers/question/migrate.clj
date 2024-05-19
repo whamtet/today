@@ -8,7 +8,9 @@
   (if (-> m :file_id (= file_id))
     (if-let [new-page (file/whole-page req file_id (:page m))]
       (assoc m :page new-page)
-      (if-let [[new-page new-line] (file/move-line req file_id (:page m) (:line m))]
+      (if-let [[new-page new-line] (some->> m
+                                            :line
+                                            (file/move-line req file_id (:page m)))]
         (assoc m :page new-page :line new-line) ;; might need to put migration-pending? here too
         (assoc m :migration-pending? true)))
     m))
