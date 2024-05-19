@@ -57,3 +57,8 @@
              (if (re-find #"^\d" v)
                (Long/parseLong v)
                v)]))))
+
+(defmacro format-js [s]
+  `(-> ~s
+    ~@(for [[to-replace replacement] (re-seq #"\{([^\}]+)}" s)]
+       `(string/replace-first ~to-replace ~(read-string replacement)))))

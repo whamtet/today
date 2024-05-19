@@ -19,8 +19,7 @@
                           :offset offset
                           :question_id (:question_id path-params)
                           :file (host (format-js "/api/file/{file_id}"))
-                          :q q})
-                  :target "_blank"}
+                          :q q})}
      [:img {:class "w-80"
             :src (format-js "/api/thumbnail/{file_id}/{(dec page)}")}]]))
 

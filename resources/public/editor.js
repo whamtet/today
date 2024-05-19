@@ -68,11 +68,5 @@ const addReference = () => {
     }
 }
 
+// for established attribute
 const openPage = (file, page) => window.open(viewerHref + '?' + new URLSearchParams({file, page}));
-
-// refresh for references
-window.onmessage = ({data}) => {
-    if (data === 'refresh') {
-        location.reload();
-    }
-}

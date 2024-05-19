@@ -14,5 +14,5 @@
 (def dev? false)
 (def prod? true)
 
-(defn host [s]
-  (str "https://app.simplifydd.com" s))
+(defn host [& strs]
+  (apply str "https://app.simplifydd.com" strs))

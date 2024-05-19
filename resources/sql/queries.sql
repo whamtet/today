@@ -62,15 +62,16 @@ insert into question (project_id, section_id, question, editor) values (:project
 -- :name update-question :execute
 update question set question = :question where question_id = :question_id;
 
--- :name update-editor :execute
-update question set editor = :editor where question_id = :question_id;
+-- :name update-editor :returning-execute
+update question set editor = :editor where question_id = :question_id
+returning project_id;
 
 -- :name insert-file :execute
 insert into file (project_id, filename, pages) values (:project_id, :filename, :pages);
 
 -- :name update-file :returning-execute
 update file set filename = :filename, pages_old = pages, pages = :pages where filename = :old-filename
-returning file_id
+returning file_id;
 
 -- :name get-files :query
 select * from file where project_id = :project_id
