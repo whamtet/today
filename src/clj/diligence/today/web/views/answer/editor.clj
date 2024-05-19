@@ -11,7 +11,6 @@
       [simpleui.core :as simpleui]
       [simpleui.render :as render]))
 
-(def default-text "Write your answer here...")
 (defn- render-reference [i {:keys [offset page file_id]}]
   [:sup {:class "reference text-blue-400 cursor-pointer relative"
          ;; can't use link because contenteditable = "true"
@@ -65,9 +64,8 @@
        (map render-lines)))
 
 (defn- get-editor [req question_id]
-  (if-let [state (question/get-editor req question_id)]
-    (render-editor state)
-    default-text))
+  (render-editor
+   (question/get-editor req question_id)))
 
 (defn button [id label onclick]
   [:button {:id id

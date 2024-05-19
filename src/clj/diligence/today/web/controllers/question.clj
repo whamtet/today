@@ -54,10 +54,13 @@
 (defn delete-section [{:keys [query-fn]} section_id]
   (query-fn :delete-section {:section_id section_id}))
 
+(def base-editor
+  {:text "Write your answer here..." :references {}})
 (defn add-question [{:keys [query-fn]} project_id section_id question]
   (query-fn :insert-question {:section_id section_id
                               :project_id project_id
-                              :question question}))
+                              :question question
+                              :editor (pr-str base-editor)}))
 
 (defn update-question [{:keys [query-fn]} question_id question]
   (query-fn :update-question {:question_id question_id
