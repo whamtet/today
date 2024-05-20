@@ -5,6 +5,7 @@
       [clojure.java.shell :refer [sh]]
       [diligence.today.web.services.diff :as diff]
       [diligence.today.web.services.grep :as grep]
+      [diligence.today.web.services.image-hash :as image-hash]
       [diligence.today.web.services.thumbnail :as thumbnail]
       [diligence.today.web.services.wc :as wc]
       [diligence.today.util :refer [mk format-js]])
@@ -42,7 +43,8 @@
        .mkdirs)
   (convert-all project_id filename)
   (->> limit range (map (convert-page project_id filename)) dorun)
-  (wc/wc! project_id filename))
+  (wc/wc! project_id filename)
+  (image-hash/hash! project_id filename))
 
 ;; todo: generate our own storage filenames
 (defn- index-filename [project_id filename i]

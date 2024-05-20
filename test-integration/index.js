@@ -20,7 +20,8 @@ const $reload = async (page, selector) => {
   }
 }
 
-const testSwap = false;
+const testSwap = true;
+const test1a = false;
 
 (async () => {
   // Launch the browser and open a new blank page
@@ -56,8 +57,10 @@ const testSwap = false;
     await reuploader.uploadFile('files/simple-swap.pdf');
     reuploader = await $reload(page, '#f1');
   }
-  
-  await reuploader.uploadFile('files/simplea.pdf');
+
+  if (test1a) {
+    await reuploader.uploadFile('files/simplea.pdf');
+  }
 
   await timeout(1000);
   get('/api/test-reference'); // print internally

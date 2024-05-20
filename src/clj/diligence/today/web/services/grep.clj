@@ -1,5 +1,6 @@
 (ns diligence.today.web.services.grep
     (:require
+      [diligence.today.web.services.image-hash :as image-hash]
       [diligence.today.util :as util :refer [format-js]]
       [clojure.java.io :as io]))
 
@@ -31,10 +32,13 @@
                (take-while #(not (.contains % fragment)))
                count))))
 
+(defn- slurp-page [project_id filename page]
+  [(slurp (grep-file project_id filename page))
+   (image-hash/slurp-hash project_id filename page)])
 (defn- slurp-range [project_id filename pages]
   (->> pages
        range
-       (map #(slurp (grep-file project_id filename %)))))
+       (map #(slurp-page project_id filename %))))
 
 (defn- split-at3 [n s]
   (let [[a [b & c]] (split-at n s)]
