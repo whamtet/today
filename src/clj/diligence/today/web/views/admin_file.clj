@@ -50,14 +50,23 @@
            [:img {:class "w-64"
                   :src (format "/api/thumbnail/%s/0" file_id)}]]))])))
 
+(defn standard-migration [project_id file_id]
+  (common/href-viewer {:migrate true
+                       :file_id file_id
+                       :project_id project_id}))
+
+(defn priority-migration [{:keys [project_id file_id question_id offset] :as m}]
+  (common/href-viewer {:migrate true
+                       :file_id file_id
+                       :project_id project_id
+                       :preferred_question_id question_id
+                       :preferred_offset offset}))
+
 (defcomponent-user ^:endpoint question-maker [req file ^:long file_id]
   (if (simpleui/post? req)
     (iam/when-authorized
      (if (migrate/migrate-file req project_id file file_id)
-       (response/hx-redirect (common/href-viewer {:migrate true
-                                                  :file_id file_id
-                                                  :project_id project_id
-                                                  :file (env/host "/api/file/" file_id)}))
+       (response/hx-redirect (standard-migration project_id file_id))
        response/hx-refresh))
     (let [{project-name :name} (project/get-project-by-id req project_id)]
       [:div {:_ "on click add .hidden to .drop"}

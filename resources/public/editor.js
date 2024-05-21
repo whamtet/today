@@ -69,4 +69,4 @@ const addReference = () => {
 }
 
 // for established attribute
-const openPage = (file, page) => window.open(viewerHref + '?' + new URLSearchParams({file, page}));
+const openPage = (file_id, page) => window.open(viewerHref + '?' + new URLSearchParams({file_id, page}));

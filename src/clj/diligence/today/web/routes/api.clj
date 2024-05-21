@@ -81,11 +81,11 @@
                                   26 {:offset 26, :fragment "Page 2", :page 1, :line 0, :file_id 1}}})
                    ok)
            :get (fn [req]
-                  (-> req
-                      (assoc :query-fn query-fn)
-                      (question/get-editor 1)
-                      prn)
-                  ok)}])
+                  (let [editor (-> req (assoc :query-fn query-fn) (question/get-editor 1))]
+                    (prn 'editor editor)
+                    {:status 200
+                     :headers {"content-type" "application/json"}
+                     :body editor}))}])
    (when dev?
          ["/test-reference2"
           (fn [req]
