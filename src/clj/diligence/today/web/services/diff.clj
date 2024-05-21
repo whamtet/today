@@ -1,22 +1,20 @@
 (ns diligence.today.web.services.diff
     (:require
-      [clojure.java.shell :refer [sh]]))
+      [clojure.java.shell :refer [sh]]
+      [diligence.today.web.services.file-locator :refer [diff-file]]))
 
-(defn diff-file [project_id filename]
-  (format "files/%s/grep/%s.txt"
-          project_id
-          (.replaceAll filename ".pdf$" "")))
-
-(defn diff-output [project_id f1 f2]
-  (let [{:keys [exit out]} (sh "diff" "-y" "-W" "1" (diff-file project_id f2) (diff-file project_id f1))]
+(defn diff-output [project_id dir old-index]
+  (let [{:keys [exit out]} (sh "diff" "-y" "-W" "1"
+                               (diff-file project_id dir (inc old-index))
+                               (diff-file project_id dir old-index))]
     (assert (< exit 2))
     (when (= 1 exit)
           (->> out
                (re-seq #" ?([<\|>]?) ?\n")
                (map second)))))
 
-(defn new-line [project_id f1 f2 line]
-  (if-let [diff-output (diff-output project_id f1 f2)]
+(defn new-line [project_id dir old-index line]
+  (if-let [diff-output (diff-output project_id dir old-index)]
     (do
       (assert (< line (count diff-output)))
       (loop [[curr-line & todo] diff-output

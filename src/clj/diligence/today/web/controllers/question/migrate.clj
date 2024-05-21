@@ -29,7 +29,11 @@
      #(->> % :editor :references vals (some :migration-pending?))
      migrated)))
 
-(defn migrate-file [req project_id file old-filename]
-  (when-let [file_id (file/copy-file req project_id file old-filename)]
-    (when (migrate-questions req project_id file_id)
-          file_id)))
+(defn migrate-file [req project_id file file_id]
+  (if file_id
+    (do
+      (file/copy-file req project_id file file_id)
+      (migrate-questions req project_id file_id))
+    (do
+      (file/new-file req project_id file)
+      nil)))

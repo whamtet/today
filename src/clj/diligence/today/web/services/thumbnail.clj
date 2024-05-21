@@ -1,26 +1,18 @@
 (ns diligence.today.web.services.thumbnail
     (:require
       [clojure.java.shell :refer [sh]]
-      [diligence.today.util :refer [format-js]])
+      [diligence.today.web.services.file-locator :as file-locator])
     (:import
       java.io.File))
 
-(defn thumbnail-file [project_id filename i]
-  (format "files/%s/thumbnails/%s/%03d.jpg"
-          project_id
-          (.replaceAll filename ".pdf$" "")
-          i))
-(defn- thumbnail-all [project_id filename]
-  (format "files/%s/thumbnails/%s/%%03d.jpg"
-          project_id
-          (.replaceAll filename ".pdf$" "")))
-
-(defn thumbnails [project_id filename]
-  (->> (.replaceAll filename ".pdf$" "")
-       (format "files/%s/thumbnails/%s" project_id)
-       File.
-       .mkdirs)
-  ;; convert first image now
-  (sh "convert" (format-js "files/{project_id}/{filename}[0]") (thumbnail-file project_id filename 0))
+(defn thumbnails [project_id dir index]
+  (-> (file-locator/thumbnail-parent project_id dir index)
+      File.
+      .mkdirs)
+  (sh "convert"
+      (str (file-locator/pdf-triple project_id dir index) "[0]")
+      (file-locator/thumbnail-file project_id dir index 0))
   (future
-   (sh "convert" (format-js "files/{project_id}/{filename}") (thumbnail-all project_id filename))))
+   (sh "convert"
+       (file-locator/pdf-triple project_id dir index)
+       (file-locator/thumbnail-all project_id dir index))))

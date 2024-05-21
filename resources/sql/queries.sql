@@ -67,11 +67,13 @@ update question set editor = :editor where question_id = :question_id
 returning project_id;
 
 -- :name insert-file :execute
-insert into file (project_id, filename, pages) values (:project_id, :filename, :pages);
+insert into file (project_id, dir, ind, filename_original, pages)
+values (:project_id, :dir, 0, :filename_original, :pages);
 
--- :name update-file :returning-execute
-update file set filename = :filename, pages_old = pages, pages = :pages where filename = :old-filename
-returning file_id;
+-- :name update-file :execute
+update file set
+ind = :index, filename_original = :filename_original, pages_old = pages, pages = :pages
+where file_id = :file_id;
 
 -- :name get-files :query
 select * from file where project_id = :project_id

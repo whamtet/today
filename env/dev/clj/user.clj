@@ -59,7 +59,7 @@
 (defn wipe []
   (halt)
   (sh "." "rm" "-r" "today_dev.db" "files")
-  (go))
+  (reset))
 
 (defn test-node []
   (wipe)

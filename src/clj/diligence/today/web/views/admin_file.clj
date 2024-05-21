@@ -13,7 +13,7 @@
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 
-(def file-accept "application/pdf")
+(def file-accept "application/pdf, .xlsx, .csv")
 (defn file-selector [req project_id]
   (let [files (file/get-files req project_id)]
     (list
@@ -29,27 +29,31 @@
      (when (not-empty files)
        [:p.my-2.text-gray-700 "Click on a file to update it"])
      [:div.flex.items-center
-      (for [{:keys [file_id filename]} files]
-        (let [filename-disp (string/replace filename #"\d+.pdf" "pdf")]
+      (for [{:keys [file_id filename_original]} files]
+        (if (.endsWith filename_original ".pdf")
           (list
            [:input {:class "hidden"
                     :id (format-js "f{file_id}")
                     :type "file"
                     :name "file"
-                    :accept file-accept
+                    :accept "application/pdf"
                     :hx-post "question-maker"
                     :hx-encoding "multipart/form-data"
-                    :hx-vals {:old-filename filename-disp}}]
+                    :hx-vals {:file_id file_id}}]
            [:div {:class "mt-2 cursor-pointer"
-                  :onclick (format-js "updateFile('{filename-disp}', 'f{file_id}')")}
-            [:div.text-center filename-disp]
+                  :onclick (format-js "updateFile('{filename_original}', 'f{file_id}')")}
+            [:div.text-center filename_original]
             [:img {:class "w-64"
-                   :src (format "/api/thumbnail/%s/0" file_id)}]])))])))
+                   :src (format "/api/thumbnail/%s/0" file_id)}]])
+          [:div {:class "mt-2"}
+           [:div.text-center filename_original]
+           [:img {:class "w-64"
+                  :src (format "/api/thumbnail/%s/0" file_id)}]]))])))
 
-(defcomponent-user ^:endpoint question-maker [req file old-filename]
+(defcomponent-user ^:endpoint question-maker [req file ^:long file_id]
   (if (simpleui/post? req)
     (iam/when-authorized
-     (if-let [file_id (migrate/migrate-file req project_id file old-filename)]
+     (if (migrate/migrate-file req project_id file file_id)
        (response/hx-redirect (common/href-viewer {:migrate true
                                                   :file_id file_id
                                                   :project_id project_id
