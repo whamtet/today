@@ -49,7 +49,7 @@
    (fn [req]
      (if-let [{:keys [project_id]}
               (and (-> req :session :user_id)
-                   (-> req (assoc :query-fn query-fn) project/get-project))]
+                   (-> req (assoc :query-fn query-fn) project/get-random-project))]
        (response/redirect (format "/project/%s/" project_id))
        (page-htmx
         {:google? (not (logged-in? req))

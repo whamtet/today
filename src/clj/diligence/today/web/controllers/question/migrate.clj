@@ -5,7 +5,8 @@
       [diligence.today.web.controllers.question :as question]))
 
 (defn- migrate-editor-value [req file_id m]
-  (if (-> m :file_id (= file_id))
+  (if (and (-> m :file_id (= file_id))
+           (-> m :migration-pending? not))
     (if-let [new-page (file/whole-page req file_id (:page m))]
       (assoc m :page new-page)
       (if-let [[new-page new-line] (some->> m

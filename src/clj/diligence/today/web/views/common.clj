@@ -2,19 +2,23 @@
     (:require
       [clojure.string :as string]
       [diligence.today.env :refer [dev?]]
+      [diligence.today.util :refer [format-js]]
+      [diligence.today.web.controllers.project :as project]
       [diligence.today.web.views.dropdown :as dropdown]))
 
 (defn main-dropdown
-  ([user_name] (main-dropdown user_name nil))
-  ([user_name project_id]
+  ([user_name] (main-dropdown user_name nil nil))
+  ([user_name project_id project-name]
    [:div.absolute.top-1.right-1.flex.items-center
     (dropdown/dropdown
      (str "Welcome " user_name)
      (list
+      (when project-name
+            [:a {:href (format-js "/project/{project_id}/")} [:div.p-2 (str project-name "...")]])
       (when project_id
-            [:a {:href (format "/project/%s/admin/" project_id)} [:div.p-2 "Edit Questions..."]])
+            [:a {:href (format-js "/project/{project_id}/admin/")} [:div.p-2 "Edit Questions..."]])
       (when project_id
-            [:a {:href (format "/project/%s/admin-file/" project_id)} [:div.p-2 "Edit Files..."]])
+            [:a {:href (format-js "/project/{project_id}/admin-file/")} [:div.p-2 "Edit Files..."]])
       [:div.p-2.cursor-pointer {:hx-post "/api/logout"} "Logout"]))]))
 
 (def viewer-location

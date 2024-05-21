@@ -13,14 +13,14 @@
       [simpleui.core :as simpleui]
       [simpleui.response :as response]))
 
-(defn- inset-disp [& body]
+(defn- inset-disp [body]
   [:div {:class "draggable p-2 overflow-y-auto overflow-x-clip
   border bg-white fixed"
                :style "top: 50px;
 right: 100px;
 width: 700px;
 height: 300px;"}
-   [:div {:hx-target "this"} body]])
+   body])
 
 (def drag-scripts
   (list
@@ -29,11 +29,11 @@ height: 300px;"}
 
 (defmacro if-init [body]
   `(if (simpleui/get? ~'req)
-    (list
+    (list*
      (output (host))
      (inset-disp ~body)
       drag-scripts)
-    ~body))
+    (list ~body)))
 
 (defn left-arrow [disp-index]
   [:div {:class "cursor-pointer"
@@ -41,7 +41,7 @@ height: 300px;"}
          :hx-vals {:disp-index (dec disp-index)}}
    icons/left-arrow])
 (defn right-arrow [disp-index]
-  [:div {:class "curosr-pointer"
+  [:div {:class "cursor-pointer"
          :hx-post "inset"
          :hx-vals {:disp-index (inc disp-index)}}
    icons/right-arrow])
@@ -70,11 +70,12 @@ height: 300px;"}
         (some-> to-migrate not-empty (nth (util/bind 0 disp-index max-index)))]
     (if (empty? to-migrate)
       (->> project_id (format "/project/%s/admin-file/") host response/hx-redirect)
-      (list
+      (list*
        [:script
         (format "migration_offset = %s;" offset)]
        (if-init
-        [:div {:hx-target "this"}
+        [:div {:class "cursor-default"
+               :hx-target "this"}
          [:form {:class "hidden"
                  :id "values-form"
                  :hx-post "inset"}

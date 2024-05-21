@@ -22,7 +22,7 @@ update project set name = :name where project_id = :project_id;
 -- :name get-projects :query
 select * from project;
 
--- :name get-project :query :one
+-- :name get-random-project :query :one
 select * from project;
 
 -- :name get-project-by-name :query :one
@@ -72,7 +72,7 @@ values (:project_id, :dir, 0, :filename_original, :pages);
 
 -- :name update-file :execute
 update file set
-ind = :index, filename_original = :filename_original, pages_old = pages, pages = :pages
+ind = :index, filename_original = :filename, pages_old = pages, pages = :pages
 where file_id = :file_id;
 
 -- :name get-files :query

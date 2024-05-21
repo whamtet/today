@@ -20,7 +20,7 @@
       [:a.absolute.left-1.top-1 {:href "/"}
        [:img.w-16.m-2 {:src "/icon.png"}]]
       (project-ro project-name)
-      (common/main-dropdown first_name project_id)]
+      (common/main-dropdown first_name project_id project-name)]
      [:div {:class "w-3/4 border rounded-md mx-auto p-1"}
       (if (empty? questions)
         [:div.text-gray-500.m-2 "Ask your admin to create questions"]

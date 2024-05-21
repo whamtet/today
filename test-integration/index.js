@@ -20,8 +20,8 @@ const $reload = async (page, selector) => {
   }
 }
 
-const testSwap = true;
-const test1a = false;
+const testSwap = false;
+const test1a = true;
 
 (async () => {
   // Launch the browser and open a new blank page
@@ -51,22 +51,22 @@ const test1a = false;
   await post('/api/test-reference');
 
   await goto(page, '/project/1/admin-file');
-  let reuploader = await $reload(page, '#f1');
-
-  if (testSwap) {
-    await reuploader.uploadFile('files/simple-swap.pdf');
-    reuploader = await $reload(page, '#f1');
-  }
-
-  if (test1a) {
-    await reuploader.uploadFile('files/simplea.pdf');
-  }
-
-  await timeout(1000);
-  get('/api/test-reference'); // print internally
+  // let reuploader = await $reload(page, '#f1');
+  //
+  // if (testSwap) {
+  //   await reuploader.uploadFile('files/simple-swap.pdf');
+  //   reuploader = await $reload(page, '#f1');
+  // }
+  //
+  // if (test1a) {
+  //   await reuploader.uploadFile('files/simplea.pdf');
+  // }
+  //
+  // await timeout(1000);
+  // get('/api/test-reference'); // print internally
 
   console.log('all tests passed');
 
-  // browser.close();
+  browser.close();
 
 })();

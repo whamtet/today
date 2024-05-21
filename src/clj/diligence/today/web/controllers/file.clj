@@ -83,7 +83,7 @@
     (thumbnail/thumbnails project_id dir index)
     (let [pages (num-pages project_id dir index)]
       (convert-pages project_id dir index pages)
-      (query-fn :update-file (mk index filename_original pages file_id)))))
+      (query-fn :update-file (mk index filename pages file_id)))))
 
 (defn get-files [{:keys [query-fn]} project_id]
   (query-fn :get-files {:project_id project_id}))

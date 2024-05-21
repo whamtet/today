@@ -24,7 +24,7 @@
  io.github.kit-clj/kit-core {:mvn/version "1.0.6"}
  io.github.kit-clj/kit-undertow {:mvn/version "1.0.6"}
  simpleui/simpleui {:git/url "https://github.com/whamtet/simpleui",
-                    :git/sha "508f4ed42ae42674d10f7f2abcdff4fc434ef624"}
+                    :git/sha "2ca1caf8db34e3d8f9e58368d11b5c858f790130"}
  io.github.kit-clj/kit-sql-conman {:mvn/version "1.10.2"}
  io.github.kit-clj/kit-sql-migratus {:mvn/version "1.0.4"}
  org.xerial/sqlite-jdbc {:mvn/version "3.36.0.3"}}

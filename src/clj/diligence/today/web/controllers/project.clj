@@ -9,8 +9,8 @@
 (defn get-projects [{:keys [query-fn]}]
   (query-fn :get-projects {}))
 
-(defn get-project [{:keys [query-fn]}]
-  (query-fn :get-project {}))
+(defn get-random-project [{:keys [query-fn]}]
+  (query-fn :get-random-project {}))
 
 (defn get-project-by-name [{:keys [query-fn]} new-project-name]
   (query-fn :get-project-by-name {:new-project-name new-project-name}))
