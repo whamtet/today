@@ -26,7 +26,7 @@
 
 (defmacro format-js [s]
   `(-> ~s
-    ~@(for [[to-replace replacement] (re-seq #"\{([^\}]+)}" s)]
+    ~@(for [[to-replace replacement] (re-seq #"\{([^}]+)}" s)]
        `(string/replace-first ~to-replace ~(read-string replacement)))))
 
 (defn format-json [fmt & args]

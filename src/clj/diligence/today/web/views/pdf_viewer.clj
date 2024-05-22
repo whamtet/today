@@ -61,8 +61,8 @@ height: 300px;"}
                                 ^:long disp-index]
   (when question_id
         (question/assoc-reference req question_id values))
-  (let [{:keys [project_id file_id]} (:src-params req)
-        to-migrate (question/get-pending-file req project_id file_id)
+  (let [{:keys [project_id file_id preferred_question_id preferred_offset]} (:src-params req)
+        to-migrate (question/get-pending-file req project_id file_id preferred_question_id preferred_offset)
         max-index (dec (count to-migrate))
         disp-index (or disp-index 0)
         {:keys [text question offset index
@@ -99,13 +99,14 @@ height: 300px;"}
                                   values)]
       (response/hx-redirect
        (host (format-js "/project/{project_id}/question/{question_id}/"))))
-    (if (-> req :src-params :migrate)
-      (inset req)
-      [:form {:class "hidden"
-              :id "values-form"
-              :hx-post "pdf-viewer"
-              :hx-vals {:question_id (-> req :src-params :question_id)}}
-       [:input#values {:type "hidden" :name "values"}]])))
+    (cond
+     (-> req :src-params :migrate) (inset req)
+     (-> req :src-params :question_id)
+     [:form {:class "hidden"
+             :id "values-form"
+             :hx-post "pdf-viewer"
+             :hx-vals {:question_id (-> req :src-params :question_id)}}
+      [:input#values {:type "hidden" :name "values"}]])))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes-simple

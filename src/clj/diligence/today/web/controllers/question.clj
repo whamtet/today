@@ -100,18 +100,24 @@
        (filter (fn [{:keys [editor]}]
                  (->> editor :references vals (some #(-> % :file_id (= file_id))))))))
 
-(defn get-pending-file [req project_id file_id]
-  (mapcat
-   (fn [{:keys [question_id question editor]}]
-     (let [{:keys [text references]} (read-string editor)]
-       (->> references
-            (sort-by first)
-            (map-indexed
-             (fn [index [_ reference]]
-               (mk-assoc reference
-                         index reference question_id question text)))
-            (filter :migration-pending?))))
-   (get-questions-flat req project_id)))
+(defn get-pending-file [req project_id file_id preferred_question_id preferred_offset]
+  (->>
+   (get-questions-flat req project_id)
+   (mapcat
+    (fn [{:keys [question_id question editor]}]
+      (let [{:keys [text references]} (read-string editor)]
+        (->> references
+             (sort-by first)
+             (map-indexed
+              (fn [index [_ reference]]
+                (mk-assoc reference
+                          index reference question_id question text)))
+             (filter :migration-pending?)))))
+   (sort-by
+    (fn [{:keys [question_id offset]}]
+      (if (= preferred_question_id question_id)
+        (if (= preferred_offset offset) 0 1)
+        2)))))
 
 (defn- update-editor [req question_id f & args]
   (set-editor
