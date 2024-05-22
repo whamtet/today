@@ -78,6 +78,28 @@
                             :hx-vals {:question_id question_id}}
                      icons/trash]]])))
 
+[:div {:class "w-2/3"}]
+(defcomponent ^:endpoint new-modal [req ^:long-option section_id]
+  (if top-level?
+    (components/modal "w-2/3"
+                      [:div.p-2
+                       [:h3.mb-2 (if section_id "New Question" "New Section")]
+                       [:form {:class "flex"
+                               :hx-post "admin"
+                               :hx-vals {:command (if section_id "new-question" "new-section")}}
+                        (when section_id [:input {:type "hidden" :name "section_id" :value section_id}])
+                        [:input {:class "w-full border rounded-md p-2 mr-2"
+                                 :name (if section_id "question" "section")
+                                 :placeholder (if section_id "New Question Name..." "New Section Name...")
+                                 :list (if section_id "suggestions" "suggestions-section")
+                                 :required true}]
+                        (components/submit "Create")]])
+    [:div {:hx-get "new-modal"
+           :hx-vals {:section_id section_id}
+           :hx-target "#modal"}
+     (components/button
+      (if section_id "New Question" "New Section"))]))
+
 (defcomponent ^:endpoint section-editor [req
                                          ^:boolean last
                                          ^:long ordering
@@ -124,11 +146,7 @@
                             (format-json "newQuestion = () => hxPost('admin:new-question', %s);"
                                          {:section_id section_id
                                           :question "Question1"})])
-                     [:div {:class ""
-                            :hx-post "admin:new-question"
-                            :hx-prompt "New question name"
-                            :hx-vals {:section_id section_id}}
-                      (components/button "New Question")]]])))
+                     (new-modal req section_id)]])))
 
 (defcomponent ^:endpoint section-section [req
                                           last?
@@ -200,9 +218,7 @@
                   [:script
                    (format-json "newSection = () => hxPost('admin:new-section', %s);"
                                 {:section "Section1"})])
-            [:div {:hx-post "admin:new-section"
-                   :hx-prompt "New section name"}
-             (components/button "Add Section")]]])))
+            (new-modal req nil)]])))
 
 (defn ui-routes [{:keys [query-fn]}]
   (simpleui/make-routes
