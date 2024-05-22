@@ -62,14 +62,6 @@
       {:status 200
        :headers {"content-type" "text/html"}
        :body (-> req (dissoc :reitit.core/match :reitit.core/router) pr-str)})]
-   ["/question/:question_id/reference"
-    (fn [req]
-      (-> req :session :user_id iam/prod-authorized!)
-      (question/assoc-reference
-       (assoc req :query-fn query-fn)
-       (-> req :path-params :question_id Long/parseLong)
-       (:body-params req))
-      ok)]
    (when dev?
          ["/test-reference"
           {:post (fn [req]
@@ -77,7 +69,7 @@
                     (assoc req :query-fn query-fn)
                     1
                     {:text "Write your answer here...",
-                     :references {5 {:offset 5, :fragment "Page 1", :page 0, :line 0, :file_id 1},
+                     :references {5 {:offset 5, :fragment "Page 1", :page 0, :line 0, :file_id 1 :migration-pending? true},
                                   26 {:offset 26, :fragment "Page 2", :page 1, :line 0, :file_id 1}}})
                    ok)
            :get (fn [req]

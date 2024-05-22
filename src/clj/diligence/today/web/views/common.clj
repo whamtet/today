@@ -7,17 +7,17 @@
       [diligence.today.web.views.dropdown :as dropdown]))
 
 (defn main-dropdown
-  ([user_name] (main-dropdown user_name nil nil))
-  ([user_name project_id project-name]
+  ([user_name] (main-dropdown user_name nil nil false))
+  ([user_name project_id project-name admin?]
    [:div.absolute.top-1.right-1.flex.items-center
     (dropdown/dropdown
      (str "Welcome " user_name)
      (list
       (when project-name
             [:a {:href (format-js "/project/{project_id}/")} [:div.p-2 (str project-name "...")]])
-      (when project_id
+      (when admin?
             [:a {:href (format-js "/project/{project_id}/admin/")} [:div.p-2 "Edit Questions..."]])
-      (when project_id
+      (when admin?
             [:a {:href (format-js "/project/{project_id}/admin-file/")} [:div.p-2 "Edit Files..."]])
       [:div.p-2.cursor-pointer {:hx-post "/api/logout"} "Logout"]))]))
 

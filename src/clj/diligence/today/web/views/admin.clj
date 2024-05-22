@@ -4,7 +4,6 @@
       [diligence.today.env :refer [dev?]]
       [diligence.today.util :as util :refer [format-json]]
       [diligence.today.web.controllers.file :as file]
-      [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.project :as project]
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [page-htmx defcomponent defcomponent-user]]
@@ -19,7 +18,7 @@
 (defcomponent ^:endpoint project-edit [req project-name]
   (if (simpleui/post? req)
     (when-let [project-name (some-> project-name .trim not-empty)]
-      (iam/when-authorized
+      (do
        (project/update-project req project_id project-name)
        response/hx-refresh))
     [:form {:class "flex items-center"
@@ -50,7 +49,7 @@
                  (when update? (question/update-question req question_id question))
                  (cond
                   delete?
-                  (iam/when-authorized
+                  (do
                    (question/delete-question req question_id)
                    response/hx-refresh)
                   edit?
@@ -153,7 +152,7 @@
                                           [base-section questions]
                                           section_id]
   (if (simpleui/delete? req)
-    (iam/when-authorized
+    (do
      (question/delete-section req section_id)
      response/hx-refresh)
     [:div.pb-12
@@ -182,15 +181,15 @@
   project-edit
   (case command
         "new-section"
-        (iam/when-authorized
+        (do
          (question/insert-section req project_id section)
          response/hx-refresh)
         "new-question"
-        (iam/when-authorized
+        (do
          (question/add-question req project_id section_id question)
          response/hx-refresh)
         "move"
-        (iam/when-authorized
+        (do
          (question/move-section req mid)
          response/hx-refresh)
         (let [questions (question/get-questions req project_id)
@@ -201,7 +200,7 @@
             [:a.absolute.left-1.top-1 {:href "/"}
              [:img.w-16.m-2 {:src "/icon.png"}]]
             (project-ro project-name)
-            (common/main-dropdown first_name project_id project-name)]
+            (common/main-dropdown first_name project_id project-name true)]
            [:datalist#suggestions
             (map
              #(vector :option {:value %})

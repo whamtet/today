@@ -2,7 +2,6 @@
     (:require
       [diligence.today.env :refer [host]]
       [diligence.today.util :as util :refer [format-js]]
-      [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.file :as file]
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [defcomponent]]
@@ -11,6 +10,7 @@
       [simpleui.response :as response]))
 
 (defcomponent ^:endpoint page-img [req ^:long file_id ^:long page ^:long offset ^:nullable q]
+  (assert edit?)
   (let [file (file/get-file req file_id)
         page (-> page (max 1) (min (:pages file)))]
     [:a#page-img {:href (common/href-viewer
@@ -37,8 +37,9 @@
                                           ;; for insertion only
                                           ^:long page
                                           command]
+  (assert edit?)
   (case command
-        "page-direct" (iam/when-authorized
+        "page-direct" (do
                        (question/assoc-reference-page req (:question_id path-params) offset selected_file (dec page))
                        response/hx-refresh)
         (modal

@@ -4,7 +4,6 @@
       [diligence.today.env :as env]
       [diligence.today.util :as util :refer [format-js]]
       [diligence.today.web.controllers.file :as file]
-      [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.question.migrate :as migrate]
       [diligence.today.web.controllers.project :as project]
       [diligence.today.web.htmx :refer [page-htmx defcomponent-user]]
@@ -64,7 +63,7 @@
 
 (defcomponent-user ^:endpoint question-maker [req file ^:long file_id]
   (if (simpleui/post? req)
-    (iam/when-authorized
+    (do
      (if (migrate/migrate-file req project_id file file_id)
        (response/hx-redirect (standard-migration project_id file_id))
        response/hx-refresh))
@@ -75,7 +74,7 @@
         [:a.absolute.left-1.top-1 {:href "/"}
          [:img.w-16.m-2 {:src "/icon.png"}]]
         [:div.my-6.mr-4.text-gray-500.text-4xl project-name]
-        (common/main-dropdown first_name project_id project-name)]
+        (common/main-dropdown first_name project_id project-name admin?)]
        [:div {:class "w-3/4 border rounded-lg mx-auto"}
         [:div.p-2
          (file-selector req project_id)]]])))

@@ -13,21 +13,21 @@
       [simpleui.render :as render]))
 
 [:sup {:class "reference text-blue-400 cursor-pointer relative text-red-500"}]
-(defn- render-reference [path-params i {:keys [offset page file_id migration-pending?]}]
+(defn- render-reference [extra i {:keys [offset page file_id migration-pending?]}]
   [:sup {:class (str "reference cursor-pointer relative"
                      (if migration-pending?
                        " text-red-500"
                        " text-blue-400"))
          ;; can't use link because contenteditable = "true"
-         :onclick (if migration-pending?
-                    (->> (mk-assoc path-params file_id offset) admin-file/priority-migration (format-json "location.href = %s"))
+         :onclick (if (and migration-pending? (:edit? extra))
+                    (->> (mk-assoc extra file_id offset) admin-file/priority-migration (format-json "location.href = %s"))
                     (format-json "openPage(%s, %s)" file_id page))
          :data-offset offset} (inc i)
    [:span {:class "absolute w-80 -top-20 invisible"}
     [:img {:src (format-js "/api/thumbnail/{file_id}/{page}")}]]])
 
 (defn- insert-references*
-  [path-params
+  [extra
    i
    text
    [reference & rest]
@@ -38,19 +38,19 @@
           (let [offset (- (:offset reference) poffset)]
             (if (>= offset (.length text))
               ;; drop remaining references
-              (conj done text (render-reference path-params i reference) " ")
+              (conj done text (render-reference extra i reference) " ")
               (recur
-                path-params
+                extra
                 (inc i)
                 (.substring text offset)
                 rest
                 (:offset reference)
-                (conj done (.substring text 0 offset) (render-reference path-params i reference)))))))
+                (conj done (.substring text 0 offset) (render-reference extra i reference)))))))
 
-(defn- insert-references [path-params text references]
+(defn- insert-references [extra text references]
   (reverse
    (insert-references*
-    path-params
+    extra
     0
     text
     references
@@ -64,16 +64,16 @@
         (.replace " " "&nbsp;"))
     s))
 
-(defn- render-editor [path-params {:keys [text references]}]
+(defn- render-editor [extra {:keys [text references]}]
   (->> references
        vals
        (sort-by :offset)
-       (insert-references path-params text)
+       (insert-references extra text)
        (map render-lines)))
 
-(defn- get-editor [req question_id]
+(defn- get-editor [{:keys [path-params session] :as req} question_id]
   (render-editor
-   (:path-params req)
+   (merge path-params session)
    (question/get-editor req question_id)))
 
 (defn button [id label onclick]
@@ -89,12 +89,13 @@
   reference-modal/reference-modal
   (case command
         "text"
-        (iam/when-authorized
+        (iam/when-edit?
          (question/update-editor-text req (:question_id path-params) text movements)
          nil)
         [:div
          [:script (format "question_id = %s" (:question_id path-params))]
-         (button "add-reference" "Add reference..." "addReference()")
-         [:div#editor.mt-2.p-2.border {:contenteditable "true"
+         (when edit?
+               (button "add-reference" "Add reference..." "addReference()"))
+         [:div#editor.mt-2.p-2.border {:contenteditable (when edit? "true")
                                        :onblur "saveEditor()"}
           (get-editor req (:question_id path-params))]]))

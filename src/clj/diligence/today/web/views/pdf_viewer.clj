@@ -2,7 +2,6 @@
     (:require
       [diligence.today.env :refer [host]]
       [diligence.today.util :as util :refer [format-js]]
-      [diligence.today.web.controllers.iam :as iam]
       [diligence.today.web.controllers.fragment :as fragment]
       [diligence.today.web.controllers.question :as question]
       [diligence.today.web.htmx :refer [output defcomponent]]
@@ -59,6 +58,7 @@ height: 300px;"}
                                 ^:long question_id
                                 ^:json values
                                 ^:long disp-index]
+  (assert edit?)
   (when question_id
         (question/assoc-reference req question_id values))
   (let [{:keys [project_id file_id preferred_question_id preferred_offset]} (:src-params req)
@@ -92,6 +92,7 @@ height: 300px;"}
 (defcomponent ^:endpoint pdf-viewer [req
                                      ^:long question_id
                                      ^:json values]
+  (assert edit?)
   (if question_id
     (let [[{:keys [project_id]}] (question/assoc-reference
                                   req

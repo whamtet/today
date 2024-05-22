@@ -43,14 +43,16 @@ const trailingNode = ({anchorNode, focusNode, anchorOffset, focusOffset}) => {
     }
 };
 
-document.onselectionchange = () => {
-    const selection = getSelection();
-    if (selection) {
-        const {anchorNode, focusNode} = selection;
-        $('#add-reference').disabled = (
-            !editorHas(anchorNode) || !editorHas(focusNode)
-            || referenceHas(anchorNode) || referenceHas(focusNode)
-        );
+if ($('#add-reference')) {
+    document.onselectionchange = () => {
+        const selection = getSelection();
+        if (selection) {
+            const {anchorNode, focusNode} = selection;
+            $('#add-reference').disabled = (
+                !editorHas(anchorNode) || !editorHas(focusNode)
+                || referenceHas(anchorNode) || referenceHas(focusNode)
+            );
+        }
     }
 }
 
