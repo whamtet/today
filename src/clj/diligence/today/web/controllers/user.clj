@@ -11,6 +11,7 @@
 
 (defn upsert-user [req]
   (when-let [info (if dev? dev-info (gsi/req->user-info req))]
+    ;; returns {:user_id 1}
     (first
      ((:query-fn req) :upsert-user info))))
 

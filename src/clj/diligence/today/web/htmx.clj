@@ -48,7 +48,7 @@
   (if-let [sym (simpleui/symbol-or-as req)]
     `(simpleui/defcomponent ~name ~args
       (let [{:keys [~'session ~'path-params]} ~sym
-            {:keys [~'user_id]} ~'session
+            {:keys [~'user_id ~'view? ~'edit? ~'admin?]} ~'session
             ~'project_id (some-> ~'path-params :project_id Long/parseLong)]
         ~@body))
     (throw (Exception. "req ill defined"))))
@@ -58,7 +58,7 @@
   (if-let [sym (simpleui/symbol-or-as req)]
     `(simpleui/defcomponent ~name ~args
       (let [{:keys [~'session ~'path-params]} ~sym
-            {:keys [~'user_id]} ~'session
+            {:keys [~'user_id ~'view? ~'edit? ~'admin?]} ~'session
             ~'project_id (some-> ~'path-params :project_id Long/parseLong)
             {:keys [~'first_name]} (user/get-user-exception ~sym)]
         ~@body))
