@@ -27,7 +27,7 @@
 
 (defn log-out-static [handler]
   (fn [req]
-    (if (-> req :session :edit?)
+    (if (-> req :session :user_id)
       (handler req)
       (response/hx-redirect "/"))))
 
