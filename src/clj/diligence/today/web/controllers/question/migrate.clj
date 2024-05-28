@@ -38,3 +38,7 @@
     (do
       (file/new-file req project_id file)
       nil)))
+
+(defn delete-file [req project_id file_id]
+  (file/delete-file req project_id file_id)
+  (question/nullify-file-references req project_id file_id))

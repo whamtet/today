@@ -100,6 +100,9 @@
        (filter (fn [{:keys [editor]}]
                  (->> editor :references vals (some #(-> % :file_id (= file_id))))))))
 
+(defn file-referenced? [req project_id file_id]
+  (-> (get-questions-file req project_id file_id) empty? not))
+
 (defn get-pending-file [req project_id file_id preferred_question_id preferred_offset]
   (->>
    (get-questions-flat req project_id)
@@ -124,6 +127,24 @@
    req
    question_id
    (apply f (get-editor req question_id) args)))
+
+(defn- update-editors [req project_id f & args]
+  (doseq [{:keys [question_id editor]} (get-questions-flat req project_id)]
+    (as-> editor e
+          (read-string e)
+          (apply f e args)
+          (set-editor req question_id e))))
+
+(defn- remove-val [x] #(when (not= % x) %))
+(defn nullify-file-references [req project_id file_id]
+  (update-editors
+   req
+   project_id
+   (fn [editor]
+     (->> editor
+          :references
+          (util/map-vals #(update % :file_id (remove-val file_id)))
+          (assoc editor :references)))))
 
 (defn- move-references [references movements]
   (->> references

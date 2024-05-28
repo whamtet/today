@@ -12,19 +12,28 @@
       [simpleui.core :as simpleui]
       [simpleui.render :as render]))
 
-[:sup {:class "reference text-blue-400 cursor-pointer relative text-red-500"}]
+[:sup {:class "reference text-blue-400 cursor-pointer relative text-red-500 text-yellow-500"}]
 (defn- render-reference [extra i {:keys [offset page file_id migration-pending?]}]
   [:sup {:class (str "reference cursor-pointer relative"
-                     (if migration-pending?
-                       " text-red-500"
-                       " text-blue-400"))
+                     (cond
+                      (not file_id)
+                      " text-yellow-500"
+                      migration-pending?
+                      " text-red-500"
+                      :else
+                      " text-blue-400"))
          ;; can't use link because contenteditable = "true"
-         :onclick (if (and migration-pending? (:edit? extra))
-                    (->> (mk-assoc extra file_id offset) admin-file/priority-migration (format-json "location.href = %s"))
-                    (format-json "openPage(%s, %s)" file_id page))
+         :onclick (cond
+                   (and migration-pending? (:edit? extra))
+                   (->> (mk-assoc extra file_id offset) admin-file/priority-migration (format-json "location.href = %s"))
+                   file_id
+                   (format-json "openPage(%s, %s)" file_id page)
+                   :else
+                   "alert('File deleted')")
          :data-offset offset} (inc i)
-   [:span {:class "absolute w-80 -top-20 invisible"}
-    [:img {:src (format-js "/api/thumbnail/{file_id}/{page}")}]]])
+   (when file_id
+         [:span {:class "absolute w-80 -top-20 invisible"}
+          [:img {:src (format-js "/api/thumbnail/{file_id}/{page}")}]])])
 
 (defn- insert-references*
   [extra
