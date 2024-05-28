@@ -91,12 +91,13 @@
    ["/file/:file_id"
     (fn [req]
       (-> req :session :user_id iam/prod-authorized!)
-      {:status 200
-       :headers {"content-type" "application/pdf"}
-       :body (-> req
-                 (assoc :query-fn query-fn)
-                 (file/get-file-stream
-                  (-> req :path-params :file_id)))})]
+      (let [[mime body] (-> req
+                            (assoc :query-fn query-fn)
+                            (file/get-file-stream
+                             (-> req :path-params :file_id)))]
+        {:status 200
+         :headers {"content-type" mime}
+         :body body}))]
    ;; retrievals
    ["/thumbnail/:file_id/:page"
     (fn [req]

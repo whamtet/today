@@ -172,6 +172,18 @@
                             offset
                             file_id
                             page]
-  (assoc-reference req
-                   question_id
-                   (mk offset file_id page)))
+  (update-editor req
+                 question_id
+                 assoc-in
+                 [:references offset]
+                 (mk offset file_id page)))
+
+(defn assoc-reference-file [req
+                            question_id
+                            offset
+                            file_id]
+  (update-editor req
+                 question_id
+                 assoc-in
+                 [:references offset]
+                 (mk offset file_id)))

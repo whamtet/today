@@ -97,10 +97,17 @@
     (io/input-stream
      (file-locator/thumbnail-file project_id dir index page))))
 
+(defn suffix->mime [suffix]
+  (case suffix
+        "csv" "text/csv"
+        "xlsx" "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        "pdf" "application/pdf"))
 (defn get-file-stream [req file_id]
-  (let [{:keys [project_id dir index]} (get-file req file_id)]
-    (io/input-stream
-     (file-locator/pdf-triple project_id dir index))))
+  (let [{:keys [project_id dir index filename_original]} (get-file req file_id)
+        suffix (last (.split filename_original "\\."))]
+    [(suffix->mime suffix)
+     (io/input-stream
+      (file-locator/file-quadruple project_id dir index suffix))]))
 
 (defn fragment-line [req {:keys [file_id page fragment]}]
   (let [{:keys [project_id dir index]} (get-file req file_id)]

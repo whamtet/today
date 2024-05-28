@@ -19,6 +19,11 @@
 
 (defformat pdf-triple "files/{project_id}/{dir}/{(pdf-file index)}")
 
+(defn- general-file [index suffix]
+  (format "f%02d.%s" index suffix))
+
+(defformat file-quadruple "files/{project_id}/{dir}/{(general-file index suffix)}")
+
 (defn- grep-dir [index]
   (format "grep%02d" index))
 (defn- grep-file* [index]

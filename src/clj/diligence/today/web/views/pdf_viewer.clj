@@ -1,6 +1,6 @@
 (ns diligence.today.web.views.pdf-viewer
     (:require
-      [diligence.today.env :refer [host]]
+      [diligence.today.env :refer [host dev?]]
       [diligence.today.util :as util :refer [format-js]]
       [diligence.today.web.controllers.fragment :as fragment]
       [diligence.today.web.controllers.question :as question]
@@ -59,7 +59,7 @@ height: 300px;"}
                                 ^:json values
                                 ^:long disp-index]
   (when question_id
-        (assert edit?)
+        (assert (or dev? edit?))
         (question/assoc-reference req question_id values))
   (let [{:keys [project_id file_id preferred_question_id preferred_offset]} (:src-params req)
         to-migrate (question/get-pending-file req project_id file_id preferred_question_id preferred_offset)
@@ -93,7 +93,7 @@ height: 300px;"}
                                      ^:long question_id
                                      ^:json values]
   (if question_id
-    (let [_ (assert edit?)
+    (let [_ (assert (or dev? edit?))
           [{:keys [project_id]}] (question/assoc-reference
                                   req
                                   question_id

@@ -29,7 +29,12 @@
     ~body
     (components/modal-scroll "w-3/4" ~body)))
 
-[:div {:class "w-80 cursor-pointer border-2 border-clj-blue"}]
+(defn- thumbnail-src [{:keys [file_id filename_original]}]
+  (if (.endsWith filename_original ".pdf")
+    (format-js "/api/thumbnail/{file_id}/0")
+    "/excel_icon.svg"))
+
+[:div {:class "w-40 cursor-pointer border-2 border-clj-blue mr-2"}]
 (defcomponent ^:endpoint reference-modal [req
                                           ^:long offset
                                           ^:nullable q
@@ -42,6 +47,9 @@
         "page-direct" (do
                        (question/assoc-reference-page req (:question_id path-params) offset selected_file (dec page))
                        response/hx-refresh)
+        "file-direct" (do
+                        (question/assoc-reference-file req (:question_id path-params) offset selected_file)
+                        response/hx-refresh)
         (modal
          (let [files (file/get-files req project_id)
                file (or
@@ -49,36 +57,47 @@
                      (first files))]
            [:div.p-2 {:hx-target "this"}
             ;; select row
-            [:div.flex.items-center
+            [:div.flex.items-start
              (map
-              (fn [{:keys [file_id]}]
-                [:img {:class (cond-> "w-40 cursor-pointer"
-                                      (-> file :file_id (= file_id))
-                                      (str " border-2 border-clj-blue"))
-                       :src (format-js "/api/thumbnail/{file_id}/0")
-                       :hx-get "reference-modal"
-                       :hx-vals {:offset offset
-                                 :q q
-                                 :selected_file file_id}}]) files)]
-
-            [:div.flex.items-center.my-2
-             [:span.mr-1 "Page"]
-             [:input {:class "p-1 border rounded-md mr-1 w-14"
-                      :id "page-input"
-                      :type "number"
-                      :name "page"
-                      :value 1
-                      :min 1
-                      :max (:pages file)
-                      :hx-get "page-img"
-                      :hx-vals {:file_id (:file_id file)
-                                :offset offset
-                                :q q}
-                      :hx-target "#page-img"}]
-             [:span {:hx-post "reference-modal:page-direct"
-                     :hx-vals {:selected_file (:file_id file)
-                               :offset offset}
-                     :hx-include "#page-input"
-                     :hx-confirm "Reference entire page?"}
-              (components/button "Reference whole page")]]
-            (page-img req (:file_id file) 1 offset q)]))))
+              (fn [{:keys [file_id filename_original] :as this-file}]
+                [:div
+                 [:div.text-center filename_original]
+                 [:img {:class (cond-> "w-40 cursor-pointer mr-2"
+                                       (-> file :file_id (= file_id))
+                                       (str " border-2 border-clj-blue"))
+                        :src (thumbnail-src this-file)
+                        :hx-get "reference-modal"
+                        :hx-vals {:offset offset
+                                  :q q
+                                  :selected_file file_id}}]]) files)]
+            (if (-> file :filename_original (.endsWith ".pdf"))
+              (list
+               [:div.flex.items-center.my-2
+                [:span.mr-1 "Page"]
+                [:input {:class "p-1 border rounded-md mr-1 w-14"
+                         :id "page-input"
+                         :type "number"
+                         :name "page"
+                         :value 1
+                         :min 1
+                         :max (:pages file)
+                         :hx-get "page-img"
+                         :hx-vals {:file_id (:file_id file)
+                                   :offset offset
+                                   :q q}
+                         :hx-target "#page-img"}]
+                [:span {:hx-post "reference-modal:page-direct"
+                        :hx-vals {:selected_file (:file_id file)
+                                  :offset offset}
+                        :hx-include "#page-input"
+                        :hx-confirm "Reference entire page?"}
+                 (components/button "Reference whole page")]]
+               (page-img req (:file_id file) 1 offset q))
+              ;; can only reference entire document
+              [:div {:class "my-2"
+                      :hx-post "reference-modal:file-direct"
+                      :hx-vals {:selected_file (:file_id file)
+                                :offset offset}
+                      :hx-confirm "Reference entire document?"}
+               (components/button "Reference file")]
+              )]))))

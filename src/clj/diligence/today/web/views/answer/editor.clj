@@ -32,8 +32,11 @@
                    "alert('File deleted')")
          :data-offset offset} (inc i)
    (when file_id
-         [:span {:class "absolute w-80 -top-20 invisible"}
-          [:img {:src (format-js "/api/thumbnail/{file_id}/{page}")}]])])
+         (if page
+           [:span {:class "absolute w-80 -top-20 invisible z-10"}
+            [:img {:src (format-js "/api/thumbnail/{file_id}/{page}")}]]
+           [:span {:class "absolute w-24 -top-20 invisible z-10"}
+            [:img {:src "/excel_icon.svg"}]]))])
 
 (defn- insert-references*
   [extra

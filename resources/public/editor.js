@@ -71,4 +71,10 @@ const addReference = () => {
 }
 
 // for established attribute
-const openPage = (file_id, page) => window.open(viewerHref + '?' + new URLSearchParams({file_id, page}));
+const openPage = (file_id, page) => {
+    if (page) {
+        window.open(viewerHref + '?' + new URLSearchParams({file_id, page}));
+    } else {
+        window.open(`/api/file/${file_id}`);
+    }
+}
