@@ -92,9 +92,9 @@ height: 300px;"}
 (defcomponent ^:endpoint pdf-viewer [req
                                      ^:long question_id
                                      ^:json values]
-  (assert edit?)
   (if question_id
-    (let [[{:keys [project_id]}] (question/assoc-reference
+    (let [_ (assert edit?)
+          [{:keys [project_id]}] (question/assoc-reference
                                   req
                                   question_id
                                   values)]
