@@ -24,7 +24,7 @@
          [:div
           [:a.inline-block {:href "/"}
            [:img.w-16.m-2 {:src "/icon.png"}]]
-          (common/main-dropdown first_name)]
+          (common/main-dropdown first_name session)]
          [:div {:class "w-1/2 border rounded-lg mx-auto"}
           ;; creation form
           [:form {:class "flex"

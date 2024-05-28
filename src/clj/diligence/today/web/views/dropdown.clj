@@ -2,7 +2,8 @@
 
 (defn- button [label]
   [:button {:type "button"
-            :class "bg-clj-blue p-2 rounded-lg text-white caret"
+            :class "flex items-center
+            bg-clj-blue p-2 rounded-lg text-white caret"
             :_ "on click halt the event then toggle .hidden on the next <div />"}
    label])
 

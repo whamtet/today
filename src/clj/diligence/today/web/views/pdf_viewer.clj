@@ -58,8 +58,8 @@ height: 300px;"}
                                 ^:long question_id
                                 ^:json values
                                 ^:long disp-index]
-  (assert edit?)
   (when question_id
+        (assert edit?)
         (question/assoc-reference req question_id values))
   (let [{:keys [project_id file_id preferred_question_id preferred_offset]} (:src-params req)
         to-migrate (question/get-pending-file req project_id file_id preferred_question_id preferred_offset)

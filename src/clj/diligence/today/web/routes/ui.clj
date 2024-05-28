@@ -1,17 +1,18 @@
 (ns diligence.today.web.routes.ui
-  (:require
-   [diligence.today.web.middleware.exception :as exception]
-   [diligence.today.web.middleware.formats :as formats]
-   [diligence.today.web.views.admin :as admin]
-   [diligence.today.web.views.admin-file :as admin-file]
-   [diligence.today.web.views.answer :as answer]
-   [diligence.today.web.views.home :as home]
-   [diligence.today.web.views.pdf-viewer :as pdf-viewer]
-   [diligence.today.web.views.question-viewer :as question-viewer]
-   [integrant.core :as ig]
-   [reitit.ring.middleware.muuntaja :as muuntaja]
-   [reitit.ring.middleware.parameters :as parameters]
-   [simpleui.response :as response]))
+    (:require
+      [diligence.today.env :refer [dev?]]
+      [diligence.today.web.middleware.exception :as exception]
+      [diligence.today.web.middleware.formats :as formats]
+      [diligence.today.web.views.admin :as admin]
+      [diligence.today.web.views.admin-file :as admin-file]
+      [diligence.today.web.views.answer :as answer]
+      [diligence.today.web.views.home :as home]
+      [diligence.today.web.views.pdf-viewer :as pdf-viewer]
+      [diligence.today.web.views.question-viewer :as question-viewer]
+      [integrant.core :as ig]
+      [reitit.ring.middleware.muuntaja :as muuntaja]
+      [reitit.ring.middleware.parameters :as parameters]
+      [simpleui.response :as response]))
 
 (defn log-out-redirect [handler]
   (fn [req]
@@ -26,10 +27,12 @@
       {:status 302, :headers {"Location" "/"}, :body ""})))
 
 (defn log-out-static [handler]
-  (fn [req]
-    (if (-> req :session :user_id)
-      (handler req)
-      (response/hx-redirect "/"))))
+  (if dev?
+    handler
+    (fn [req]
+      (if (-> req :session :user_id)
+        (handler req)
+        (response/hx-redirect "/")))))
 
 (defn route-data [opts]
   (merge

@@ -19,7 +19,7 @@
       [:a.absolute.left-1.top-1 {:href "/"}
        [:img.w-16.m-2 {:src "/icon.png"}]]
       [:div.my-6.mr-4.text-gray-500.text-4xl question-name]
-      (common/main-dropdown first_name project_id project-name admin?)]
+      (common/main-dropdown first_name project_id project-name session)]
      [:div {:class "w-3/4 border rounded-lg mx-auto p-2"}
       (if (file/empty-files? req project_id)
         [:p "Ask your administrator to upload files"]
