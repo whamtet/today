@@ -15,7 +15,9 @@
 
 (def files (File. "files"))
 
-(defn- num-pages [project_id dir index]
+(defn- num-pages
+  "num of pages in pdf"
+  [project_id dir index]
   (->> (file-locator/pdf-triple project_id dir index)
        (sh "pdftotext" "-f" "10000")
        :err

@@ -17,6 +17,7 @@
        (map #(-> % last Long/parseLong))))
 
 (defn convert
+  "convert between global-line and [page line]"
   ([project_id dir index global-line]
    (loop [[curr-wc & todo] (wc project_id dir index)
           global-line global-line

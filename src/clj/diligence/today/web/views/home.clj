@@ -7,6 +7,7 @@
       [diligence.today.web.htmx :refer [page-htmx
                                         defcomponent
                                         defcomponent-user]]
+      [diligence.today.web.services.gsi :as gsi]
       [diligence.today.web.views.dropdown :as dropdown]
       [diligence.today.web.views.icons :as icons]
       [diligence.today.web.views.project-selector :as project-selector]))
@@ -22,7 +23,7 @@
   [:div
    [:div
     {:id "g_id_onload",
-     :data-client_id (System/getenv "GSI_CLIENT")
+     :data-client_id gsi/client-id
      :data-context "signin",
      :data-ux_mode "redirect",
      :data-login_uri (host "/api/gsi")

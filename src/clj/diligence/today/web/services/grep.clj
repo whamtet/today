@@ -20,7 +20,9 @@
                 (.split "\n")
                 (->> (take 10) (map parse-line)))))
 
-(defn fragment-line [project_id dir index page fragment]
+(defn fragment-line
+  "line number of a fragment of text"
+  [project_id dir index page fragment]
   (let [s (slurp (file-locator/grep-file project_id dir index page))]
     (when (-> (.split s fragment) count (= 2))
           (->> (.split s "\n")
@@ -39,7 +41,9 @@
   (let [[a [b & c]] (split-at n s)]
     [b (concat a c)]))
 
-(defn whole-page [project_id dir index pages_old pages page]
+(defn whole-page
+  "returns index of page in new document when it uniquely matches the old one"
+  [project_id dir index pages_old pages page]
   (assert (pos? index))
   (let [[page others] (->> (slurp-range project_id dir (dec index) pages_old)
                            (split-at3 page))]

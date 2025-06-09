@@ -1,5 +1,10 @@
 # today
 
+## Binary Dependencies
+
+    sudo apt install graphicsmagick-imagemagick-compat
+    sudo apt install poppler-utils
+
 Start a [REPL](#repls) in your editor or terminal of choice.
 
 Start the server with:

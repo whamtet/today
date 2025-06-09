@@ -16,7 +16,9 @@
         (assoc m :migration-pending? true)))
     m))
 
-(defn migrate-questions [req project_id file_id]
+(defn- migrate-questions
+  "migrate all editor references to file_id"
+  [req project_id file_id]
   (let [migrated (map
                   (fn [question]
                     (update-in question
