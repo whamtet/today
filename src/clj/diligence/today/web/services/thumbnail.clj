@@ -5,6 +5,9 @@
     (:import
       java.io.File))
 
+;; testing only
+(def thumbnail-future (atom nil))
+
 (defn thumbnails [project_id dir index]
   (-> (file-locator/thumbnail-parent project_id dir index)
       File.
@@ -12,7 +15,8 @@
   (sh "convert"
       (str (file-locator/pdf-triple project_id dir index) "[0]")
       (file-locator/thumbnail-file project_id dir index 0))
-  (future
-   (sh "convert"
-       (file-locator/pdf-triple project_id dir index)
-       (file-locator/thumbnail-all project_id dir index))))
+  (reset! thumbnail-future
+          (future
+            (sh "convert"
+                (file-locator/pdf-triple project_id dir index)
+                (file-locator/thumbnail-all project_id dir index)))))

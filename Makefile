@@ -7,7 +7,7 @@ run:
 repl:
 	clj -M:dev:nrepl
 
-test:
+testz:
 	clj -M:test
 
 uberjarlight:

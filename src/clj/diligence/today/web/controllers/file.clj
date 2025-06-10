@@ -40,6 +40,8 @@
       (file-locator/pdf-triple project_id dir index)
       (file-locator/diff-file project_id dir index)))
 
+(def conversion-future (atom nil))
+
 (defn- convert-pages [project_id dir index limit]
   (->> (file-locator/grep-parent project_id dir index)
        File.
@@ -51,6 +53,7 @@
 
 (defn new-file [{:keys [query-fn]} project_id {:keys [tempfile filename]}]
   (let [suffix (re-find #".\w+$" filename)
+        ;; use tempfile name to ensure uniqueness
         dir-name (-> tempfile .getName (.split "-") last (.replace ".tmp" ""))
         filename-storage (str "f00" suffix)
         storage-dir (->> dir-name (str project_id "/") (File. files))]
@@ -59,8 +62,9 @@
     (if (= ".pdf" suffix)
       (let [pages (num-pages project_id dir-name 0)]
         (thumbnail/thumbnails project_id dir-name 0)
-        (future
-         (convert-pages project_id dir-name 0 pages))
+        (reset! conversion-future
+                (future
+                  (convert-pages project_id dir-name 0 pages)))
         (query-fn :insert-file {:project_id project_id
                                 :dir dir-name
                                 :filename_original filename
@@ -70,6 +74,11 @@
                               :dir dir-name
                               :filename_original filename
                               :pages nil}))))
+
+;; used for testing
+(defn await-conversion! []
+  @@thumbnail/thumbnail-future
+  @@conversion-future)
 
 (defn get-file [{:keys [query-fn]} file_id]
   (as-> (query-fn :get-file {:file_id file_id}) m
