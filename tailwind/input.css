@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 h1 {
-    @apply text-5xl
+    font-size: 5rem;
+    line-height: 1;
 }
 
 h2 {

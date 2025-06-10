@@ -65,8 +65,10 @@
       (project-selector/project-selector req)
       (account-selector req))
    [:div
-    [:img {:class "mt-20 mb-12 w-1/2 mx-auto"
-           :src "/base_logo_transparent_background.png"}]
+    [:div.mt-20.mb-12.flex.justify-center.items-center
+     [:img {:class "w-20 mr-10"
+            :src "/icon.png"}]
+     [:h1.text-dd-blue "DDIndex"]]
     [:div.flex.w-full.justify-center
      (if dev?
        [:a#home {:href "/api/gsi"} "Login"]
