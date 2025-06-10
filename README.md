@@ -1,8 +1,8 @@
 # today
 
-## Binary Dependencies
+## Binary Dependencies (Tested on Ubuntu 25)
 
-    sudo apt install graphicsmagick-imagemagick-compat
+    sudo apt install imagemagick-7.q16
     sudo apt install poppler-utils
 
 Start a [REPL](#repls) in your editor or terminal of choice.
