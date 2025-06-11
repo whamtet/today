@@ -138,7 +138,9 @@
     (assert (pos? index))
     (move-line* project_id dir index page line)))
 
-(defn delete-file [{:keys [query-fn]} project_id file_id]
+(defn delete-file
+  "this is called from migrate"
+  [{:keys [query-fn]} project_id file_id]
   (let [[{:keys [dir]}] (query-fn :delete-file {:file_id file_id})
         storage-dir (->> dir (str project_id "/") (File. files))]
     (sh "rm" "-r" (str storage-dir))))

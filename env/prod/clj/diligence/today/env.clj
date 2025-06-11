@@ -15,4 +15,4 @@
 (def prod? true)
 
 (defn host [& strs]
-  (apply str "https://ddindex.simpleui.io" strs))
+  (apply str "https://doc-index.simpleui.io" strs))

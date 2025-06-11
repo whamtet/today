@@ -35,8 +35,8 @@
     [:title "DDIndex"]
     [:meta {:property "og:title" :content "DDIndex"}]
     [:meta {:property "og:type" :content "website"}]
-    [:meta {:property "og:url" :content "https://ddindex.simpleui.io/"}]
-    [:meta {:property "og:image" :content "https://ddindex.simpleui.io/icon.png"}]
+    [:meta {:property "og:url" :content "https://doc-index.simpleui.io/"}]
+    [:meta {:property "og:image" :content "https://doc-index.simpleui.io/icon.png"}]
     [:link {:rel "icon" :href "/icon.png"}]
     (output "")]
    [:body
