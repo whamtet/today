@@ -27,8 +27,8 @@
 
 (def viewer-location
   (if dev?
-    "http://localhost:8888/web/index.html"
-    "https://pdf.simpleui.io"))
+    "http://localhost:8888/web/viewer.html"
+    "https://doc-index.simpleui.io/pdf.js/web/viewer.html"))
 
 (defn- params [m]
   (->> m
