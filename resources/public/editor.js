@@ -2,7 +2,7 @@ const $ = x => document.querySelector(x);
 const $$ = x => Array.from(document.querySelectorAll(x));
 
 const isDev = location.host.startsWith('localhost');
-const viewerHref = isDev ? 'http://localhost:8888/web/index.html' : 'https://app.simplifydd.com/pdf.js/web/';
+const viewerHref = isDev ? 'http://localhost:8888/web/viewer.html' : 'https://doc-index.simpleui.io/pdf.js/web/viewer.html';
 
 const isText = el => el.nodeType === el.TEXT_NODE;
 const editorHas = x => $('#editor').contains(x);

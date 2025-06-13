@@ -90,14 +90,17 @@
               "http://localhost:8888/web/index.html?migrate=true&file_id=1&project_id=1&file=http://localhost:2998/api/file/1"))])
    ["/file/:file_id"
     (fn [req]
-      (-> req :session :user_id iam/prod-authorized!)
-      (let [[mime body] (-> req
-                            (assoc :query-fn query-fn)
-                            (file/get-file-stream
-                             (-> req :path-params :file_id)))]
-        {:status 200
-         :headers {"content-type" mime}
-         :body body}))]
+      (if (-> req :session :user_id iam/prod-authorized?)
+        (let [[mime body] (-> req
+                              (assoc :query-fn query-fn)
+                              (file/get-file-stream
+                               (-> req :path-params :file_id)))]
+          {:status 200
+           :headers {"content-type" mime}
+           :body body})
+        {:status 401
+         :headers {}
+         :body ""}))]
    ;; retrievals
    ["/thumbnail/:file_id/:page"
     (fn [req]

@@ -7,8 +7,8 @@
     (assert ~'user_id)
     ~@body))
 
-(defn prod-authorized! [user_id]
-  (assert (or dev? user_id)))
+(defn prod-authorized? [user_id]
+  (or dev? user_id))
 
 (defmacro when-read? [& body]
   `(when ~'read? ~@body))
